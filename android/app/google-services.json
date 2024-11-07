@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "641062191147",
+    "project_id": "caketea-f7c95",
+    "storage_bucket": "caketea-f7c95.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:641062191147:android:f0173f67dc9727631faa6e",
+        "android_client_info": {
+          "package_name": "com.anonymous.SugarCake_Tea"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDwD5SV0TBltwhx1p-fhpwxQVWqboW81Gk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
