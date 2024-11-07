@@ -9,7 +9,8 @@ const EditProfileScreen = ({ navigation }) => {
     fullName: '',
     phoneNumber: '',
     address: '',
-    gender: ''
+    gender: '',
+    email: '',
   })
   
   // State cho DropDownPicker
@@ -30,7 +31,8 @@ const EditProfileScreen = ({ navigation }) => {
               fullName: data.fullName,
               phoneNumber: data.phoneNumber,
               address: data.address,
-              gender: data.gender
+              gender: data.gender,
+              email: data.email,
             })
           }
         })
@@ -69,6 +71,15 @@ const EditProfileScreen = ({ navigation }) => {
           value={userData.fullName}
           onChangeText={(text) => setUserData({...userData, fullName: text})}
           placeholder="Nhập họ và tên"
+        />
+        
+        <Text style={styles.label}>Email</Text>
+        <TextInput
+          style={styles.input}
+          value={userData.email}
+          onChangeText={(text) => setUserData({...userData, email: text})}
+          placeholder="Nhập Email"
+          editable={false}
         />
 
         <Text style={styles.label}>Số điện thoại</Text>
@@ -144,7 +155,7 @@ const styles = StyleSheet.create({
     borderColor: '#ddd',
   },
   button: {
-    backgroundColor: '#4CAF50',
+    backgroundColor: '#D17842',
     padding: 15,
     borderRadius: 5,
     alignItems: 'center',

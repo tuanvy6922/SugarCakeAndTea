@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { View, PermissionsAndroid, Platform, Alert, TextInput, Button, Image, TouchableOpacity, Text } from 'react-native';
+import { View, PermissionsAndroid, Platform, Alert, TextInput, Button, Image, TouchableOpacity, Text, StyleSheet } from 'react-native';
 import MapView, { Marker, Polyline } from 'react-native-maps';
 import Geolocation from '@react-native-community/geolocation';
 import firestore from '@react-native-firebase/firestore';
@@ -363,32 +363,14 @@ const StoreLocationScreen = () => {
   };
 
   return (
-    <View style={{ 
-      flex: 1,
-      backgroundColor: 'white',
-    }}>
+    <View style={styles.container}>
       {/* Header container */}
-      <View style={{
-        backgroundColor: 'white',
-        paddingTop: 10,
-        paddingHorizontal: 10,
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 10,
-        elevation: 5,
-        shadowColor: '#000',
-        shadowOffset: {
-          width: 0,
-          height: 2,
-        },
-        shadowOpacity: 0.25,
-        shadowRadius: 3.84,
-      }}>
+      <View style={styles.headerContainer}>
         <TouchableOpacity
           style={{
             padding: 8,
             borderRadius: 20,
-            backgroundColor: '#f0f0f0',
+            backgroundColor: '#ffffff',
           }}
           onPress={() => navigation.goBack()}
         >
@@ -402,6 +384,7 @@ const StoreLocationScreen = () => {
               borderColor: 'gray',
               borderWidth: 1,
               paddingLeft: 8,
+              marginTop: 10,
               marginBottom: showSuggestions ? 0 : 10,
               borderRadius: 5,
               backgroundColor: 'white'
@@ -415,24 +398,11 @@ const StoreLocationScreen = () => {
 
       {/* Suggestions list */}
       {showSuggestions && addressSuggestions.length > 0 && (
-        <View style={{
-          maxHeight: 200,
-          backgroundColor: 'white',
-          borderWidth: 1,
-          borderColor: 'gray',
-          marginHorizontal: 10,
-          borderRadius: 5,
-          zIndex: 1000,
-          elevation: 5,
-        }}>
+        <View style={styles.suggestionsList}>
           {addressSuggestions.map((suggestion, index) => (
             <TouchableOpacity
               key={index}
-              style={{
-                padding: 10,
-                borderBottomWidth: 1,
-                borderBottomColor: '#eee'
-              }}
+              style={styles.suggestionItem}
               onPress={() => handleSelectAddress(suggestion)}
             >
               <Text>{suggestion.formatted}</Text>
@@ -441,9 +411,9 @@ const StoreLocationScreen = () => {
         </View>
       )}
 
-      <View style={{ padding: 10 }}>
+      <View style={styles.buttonContainer}>
         <Button
-          title="Lấy vị trí hiện tại"
+          title="Chọn vị trí hiện tại"
           onPress={() => {
             // Hiển thị loading để người dùng biết đang xử lý
             Alert.alert('Thông báo', 'Đang lấy vị trí của bạn...');
@@ -541,12 +511,14 @@ const StoreLocationScreen = () => {
               }
             );
           }}
+          color="#D17842" // Thay đổi màu nút
+          style={styles.currentLocationButton} // Gọi lại style cho nút
         />
       </View>
 
       <MapView
         ref={mapRef}
-        style={{ flex: 1 }}
+        style={styles.map}
         initialRegion={{
           latitude: 10.980724795723445,
           longitude: 106.67531866840427,
@@ -597,6 +569,55 @@ const StoreLocationScreen = () => {
     </View>
   );
 };
+
+// Định nghĩa các kiểu dáng
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: 'white',
+  },
+  headerContainer: {
+    backgroundColor: 'white',
+    paddingTop: 10,
+    paddingHorizontal: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    elevation: 5,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+  },
+  suggestionsList: {
+    maxHeight: 200,
+    backgroundColor: 'white',
+    borderWidth: 1,
+    borderColor: 'gray',
+    marginHorizontal: 10,
+    borderRadius: 5,
+    zIndex: 1000,
+    elevation: 5,
+  },
+  suggestionItem: {
+    padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
+  },
+  buttonContainer: {
+    padding: 10,
+    width: 'auto',
+  },
+  currentLocationButton: {
+    borderRadius: 10, // Bo góc nút
+  },
+  map: {
+    flex: 1,
+  },
+});
 
 
 export default StoreLocationScreen;

@@ -6,6 +6,7 @@ import { useContext } from 'react';
 import { CartContext } from '../components/CartContext';
 import CryptoJS from 'crypto-js';
 import moment from 'moment';
+import { Entypo } from 'react-native-vector-icons';
 
 // Cấu hình ZaloPay
 const config = {
@@ -62,14 +63,14 @@ const PaymentScreen = ({ navigation }) => {
           // Chỉ thêm hóa đơn vào Firestore nếu thanh toán thành công
           await firestore().collection('Bills').add(bill);
           clearCart(); // Xóa sản phẩm trong giỏ hàng đã thanh toán
-          navigation.navigate('Bill'); // Điều hướng đến màn hình hóa đơn
+          navigation.navigate('Bill-nav'); // Điều hướng đến màn hình hóa đơn
         }
       } else {
         // Xử lý thanh toán bằng tiền mặt
         await firestore().collection('Bills').add(bill); // Tạo hóa đơn ngay lập tức
         clearCart(); // Xóa sản phẩm trong giỏ hàng đã thanh toán
         Alert.alert('Thông báo','Đơn hàng của bạn đã được xác nhận');
-        navigation.navigate('Bill'); // Điều hướng đến màn hình hóa đơn
+        navigation.navigate('Bill-nav'); // Điều hướng đến màn hình hóa đơn
       }
     } catch (error) {
       Alert.alert('Lỗi', 'Có lỗi xảy ra khi lưu hóa đơn.');
@@ -130,6 +131,12 @@ const PaymentScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Entypo name="chevron-left" size={24} color="#000" />
+        </TouchableOpacity>
+        <Text style={styles.title}>Phương thức thanh toán</Text>
+      </View>
       <Text style={styles.label}>Địa chỉ giao hàng:</Text>
       <TextInput
         style={styles.input}
@@ -209,6 +216,17 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  title: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginLeft: 10,
+    justifyContent:'center',
   },
 });
 

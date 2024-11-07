@@ -22,6 +22,7 @@ import ItemList from '../src/screens/ItemList';
 import AppNavigator from './StackNavigation';
 import SearchStackNavigator from './SearchStackNavigator';
 import ProfileStackNavigator from './ProfileStackNavigation';
+import OrderStackNavigation from './OrderStackNavigation';
 
 const Tab = createBottomTabNavigator();
 const TabNavigation = () => {
@@ -97,8 +98,8 @@ const TabNavigation = () => {
         }}
       />
       <Tab.Screen
-        name="Bill"
-        component={OrderHistoryScreen}
+        name="Bill-nav"
+        component={OrderStackNavigation}
         options={{
           tabBarLabel: "Biến động",
           headerShown: false,

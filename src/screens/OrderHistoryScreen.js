@@ -1,9 +1,10 @@
-import { StyleSheet, Text, View, FlatList, Image } from 'react-native';
+import { StyleSheet, Text, View, FlatList, Image, TouchableOpacity } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
+import { AntDesign } from '@expo/vector-icons';
 
-const OrderHistoryScreen = () => {
+const OrderHistoryScreen = ({ navigation }) => {
   const [bills, setBills] = useState([]);
 
   useEffect(() => {
@@ -38,43 +39,32 @@ const OrderHistoryScreen = () => {
       return total + (price * product.quantity);
     }, 0);
 
+    // Tạo một bản sao của item và chuyển đổi date thành string
+    const orderData = {
+      ...item,
+      date: item.date ? item.date.toISOString() : null, // Chuyển date thành string
+    };
+
     return (
-      <View style={styles.billContainer}>
-        <Text style={styles.billText}>Tên: {item.fullName}</Text>
-        <Text style={styles.billText}>Tài khoản: {item.user}</Text>
+      <TouchableOpacity 
+        style={styles.billContainer}
+        onPress={() => navigation.navigate('OrderDetail', { order: orderData })}
+      >
+        <Text style={styles.billText}>Khách hàng: {item.fullName}</Text>
         <Text style={styles.billText}>
           Thời gian giao dịch: {item.date ? item.date.toLocaleString('vi-VN') : 'N/A'}
         </Text>
         <Text style={styles.billText}>Địa chỉ: {item.address}</Text>
-        <Text style={styles.billText}>Phương thức thanh toán: {item.paymentMethod}</Text>
-        <Text style={styles.billText}>Sản phẩm:</Text>
-        {item.items.map((product, index) => (
-          <View key={index} style={styles.productContainer}>
-            {product.image && (
-              <Image source={{ uri: product.image }} style={styles.productImage} />
-            )}
-            <View style={styles.productDetails}>
-              <Text style={styles.billText}>
-                {product.name}
-              </Text>
-              <View style={styles.quantityPriceContainer}>
-                <Text style={styles.SizeText}>
-                  Size: {product.size}
-                </Text>
-                <Text style={styles.quantityText}>
-                  Số lượng: {product.quantity}
-                </Text>
-              </View>
-              <Text style={styles.priceText}>
-                Price: {Number(parseFloat(product.price).toFixed(0)).toLocaleString('en-US') || 'N/A'} VND
-              </Text>
-            </View>
+        <View style={styles.totalContainer}>
+          <Text style={styles.totalText}>
+            Tổng tiền: {Number(totalAmount.toFixed(0)).toLocaleString('en-US')} VND
+          </Text>
+          <View style={styles.detailContainer}>
+            <Text style={styles.detailText}>Xem chi tiết</Text>
+            <AntDesign name="right" size={20} color="blue" />
           </View>
-        ))}
-        <Text style={styles.totalText}>
-          Tổng tiền: {Number(totalAmount.toFixed(0)).toLocaleString('en-US')} VND
-        </Text>
-      </View>
+        </View>
+      </TouchableOpacity>
     );
   };
 
@@ -90,6 +80,7 @@ const OrderHistoryScreen = () => {
       ) : (
         <View style={styles.emptyContainer}>
           <Text style={styles.title}>Bạn chưa có lịch sử đơn hàng nào !</Text>
+          <Text style={styles.promptText}>Hãy mua sắm ngay để có hóa đơn đầu tiên của bạn.</Text>
         </View>
       )}
     </View>
@@ -120,7 +111,6 @@ const styles = StyleSheet.create({
   },
   billText: {
     fontSize: 16,
-    fontWeight: 'bold',
     marginVertical: 2,
     flexWrap: 'wrap',
     flexShrink: 1,
@@ -139,9 +129,8 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
   totalText: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: 'bold',
-    marginTop: 10,
     textAlign: 'right',
     color: '#D17842',
   },
@@ -179,5 +168,33 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  instructionText: {
+    fontSize: 16,
+    fontStyle: 'italic',
+    textAlign: 'center',
+    marginBottom: 10,
+  },
+  promptText: {
+    fontSize: 16,
+    textAlign: 'center',
+    marginTop: 10,
+    color: '#888',
+  },
+  totalContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginTop: 5,
+  },
+  detailContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginLeft: 10,
+  },
+  detailText: {
+    fontSize: 14,
+    color: 'blue',
+    marginRight: 5,
   },
 });
