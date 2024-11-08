@@ -4,8 +4,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import HomeScreen from '../src/screens/HomeScreen';
 import DetailScreen from '../src/screens/DetailScreen'; // Đảm bảo đường dẫn này đúng
 import ItemList from '../src/screens/ItemList';
-import ProfileScreen from '../src/screens/ProfileScreen';
-import SearchScreen from '../src/screens/SearchScreen';
+
 
 const Stack = createStackNavigator();
 

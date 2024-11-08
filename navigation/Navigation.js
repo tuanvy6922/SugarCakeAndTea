@@ -7,11 +7,10 @@ import LoginScreen from '../src/screens/LoginScreen';
 import RegisterScreen from '../src/screens/RegisterScreen';
 import IntroScreen from '../src/screens/IntroScreen';
 import ForgotPassword from '../src/screens/ForgotPassword';
-import OrderHistoryScreen from '../src/screens/OrderHistoryScreen';
 import ItemList from '../src/screens/ItemList';
 import PaymentScreen from '../src/screens/PaymentScreen';
-import CartScreen from '../src/screens/CartScreen';
 import StoreLocationScreen from '../src/screens/StoreLocationScreen';
+
 
 const Stack = createNativeStackNavigator();
 

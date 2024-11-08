@@ -2,27 +2,17 @@ import { StyleSheet, Text, View } from 'react-native'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { NavigationContainer } from '@react-navigation/native';
-import { Entypo } from "@expo/vector-icons";
+import { Entypo, AntDesign } from "@expo/vector-icons";
 import { Ionicons } from '@expo/vector-icons';
 import { MaterialIcons } from '@expo/vector-icons';
-import LoginScreen from '../src/screens/LoginScreen';
-import RegisterScreen from '../src/screens/RegisterScreen';
-import IntroScreen from '../src/screens/IntroScreen';
-import ForgotPassword from '../src/screens/ForgotPassword';
 import CartScreen from '../src/screens/CartScreen';
-import FavoritesScreen from '../src/screens/FavoritesScreen';
 import React, { useContext} from 'react'
 import { CartContext } from '../src/components/CartContext';
-import OrderHistoryScreen from '../src/screens/OrderHistoryScreen';
-import HomeScreen from '../src/screens/HomeScreen';
-import ProfileScreen from '../src/screens/ProfileScreen';
-import SearchScreen from '../src/screens/SearchScreen';
-import DetailScreen from '../src/screens/DetailScreen';
-import ItemList from '../src/screens/ItemList';
 import AppNavigator from './StackNavigation';
-import SearchStackNavigator from './SearchStackNavigator';
 import ProfileStackNavigator from './ProfileStackNavigation';
 import OrderStackNavigation from './OrderStackNavigation';
+import DiscoverScreen from '../src/screens/DiscoverScreen';
+import DiscoverStackNavigation from './DiscoverStackNavigation';
 
 const Tab = createBottomTabNavigator();
 const TabNavigation = () => {
@@ -63,6 +53,22 @@ const TabNavigation = () => {
             ),
         }}
       />
+      <Tab.Screen 
+        name="Discover-nav" 
+        component={DiscoverStackNavigation}
+        options={{
+          tabBarIcon: ({ focused }) => (
+            focused ? (
+              <Entypo name="compass" size={24} color="blue" />
+            ) : (
+              <Entypo name="compass" size={24} color="grey" />
+            )
+          ),
+          title: 'Khám phá',
+          headerShown: false,
+          tabBarLabelStyle: { color: "black" },
+        }}
+      />
       <Tab.Screen
         name="Cart"
         component={CartScreen}
@@ -80,21 +86,6 @@ const TabNavigation = () => {
               )}
             </View>
           ),
-        }}
-      />
-      <Tab.Screen
-        name="Search-nav"
-        component={SearchStackNavigator}
-        options={{
-          tabBarLabel: "Tìm kiếm",
-          headerShown: false,
-          tabBarLabelStyle: { color: "black" },
-          tabBarIcon: ({ focused }) =>
-            focused ? (
-              <Entypo name="magnifying-glass" size={24} color="blue" />
-            ) : (
-              <Entypo name="magnifying-glass" size={24} color="grey" />
-            ),
         }}
       />
       <Tab.Screen

@@ -138,7 +138,7 @@ const HomeScreen = () => {
                 <Text style={styles.productName} numberOfLines={1}>{item.name}</Text>
                 <Text style={styles.productDescription} numberOfLines={1}>{item.special_ingredient}</Text>
                 <Text style={styles.productPrice}>
-                  Price: {item.price && item.price.S ? item.price.S.toLocaleString('en-US') : 'N/A'} VND
+                  Giá: {item.price && item.price.S ? item.price.S.toLocaleString('en-US') : 'N/A'} VND
                 </Text>
               </View>
             </View>
@@ -164,7 +164,7 @@ const HomeScreen = () => {
               <Text style={styles.productName} numberOfLines={1}>{item.name}</Text>
               <Text style={styles.productDescription} numberOfLines={1}>{item.special_ingredient}</Text>
               <Text style={styles.productPrice}>
-                Price: {item.price && item.price.S ? item.price.S.toLocaleString('en-US') : 'N/A'} VND
+                Giá: {item.price && item.price.S ? item.price.S.toLocaleString('en-US') : 'N/A'} VND
               </Text>
             </View>
           </TouchableOpacity>

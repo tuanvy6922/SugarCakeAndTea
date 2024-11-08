@@ -123,7 +123,7 @@ const DetailScreen = ({ route }) => {
 
       <View style={styles.priceContainer}>
         <Text style={styles.productPrice}>
-          Price: {price[selectedSize] ? Number(price[selectedSize]).toLocaleString('en-US') : 'N/A'} VND
+          Giá: {price[selectedSize] ? Number(price[selectedSize]).toLocaleString('en-US') : 'N/A'} VND
         </Text>
         <TouchableOpacity style={styles.addToCartButton} onPress={handleAddToCart}>
           <Text style={styles.buttonText}>Add to Cart</Text>
