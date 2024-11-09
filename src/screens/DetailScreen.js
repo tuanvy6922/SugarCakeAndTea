@@ -42,6 +42,7 @@ const DetailScreen = ({ route }) => {
       name: currentProduct.name,
       image: currentProduct.imagelink_square,
       specialIngredient: currentProduct.special_ingredient,
+      ingredients: currentProduct.ingredients,
       size: selectedSize,
       price: price[selectedSize] || 'N/A',
       description: currentProduct.description,
@@ -94,8 +95,8 @@ const DetailScreen = ({ route }) => {
             <Entypo name="heart" size={28} color={isFavorite(currentProduct.id) ? 'red' : 'black'} />
           </TouchableOpacity>
         </View>
-        <Text style={styles.productRating}>Rating: {currentProduct.ratings_count}</Text>
-        <Text style={styles.productSpecialIngredient}>{currentProduct.special_ingredient}</Text>
+        <Text style={styles.productRating}>Nguyên liệu: {currentProduct.ingredients}</Text>
+        <Text style={styles.productSpecialIngredient}>Thành phần đặc biệt: {currentProduct.special_ingredient}</Text>
       </View>
 
       <Text style={styles.productDescription}>
@@ -170,12 +171,12 @@ const styles = StyleSheet.create({
   },
   productRating: {
     fontSize: 16,
-    color: 'orange',
+    color: 'black',
     marginVertical: 4,
   },
   productSpecialIngredient: {
     fontSize: 16,
-    color: 'black',
+    color: 'red',
     marginVertical: 4,
   },
   toggleDescriptionText: {

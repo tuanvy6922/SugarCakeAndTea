@@ -99,6 +99,7 @@ const DiscoverScreen = () => {
           onPress={() => navigation.navigate('SearchScreen')}
         >
           <Entypo name="magnifying-glass" size={24} color="#333" />
+          <Text style={styles.searchText}>Tìm kiếm</Text>
         </TouchableOpacity>
       </View>
       
@@ -141,6 +142,8 @@ const styles = StyleSheet.create({
     color: '#333',
   },
   searchButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
     padding: 8,
     borderRadius: 20,
     backgroundColor: '#fff',
@@ -152,6 +155,11 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
+  },
+  searchText: {
+    marginLeft: 4,
+    fontSize: 16,
+    color: '#333',
   },
   loadingContainer: {
     flex: 1,
