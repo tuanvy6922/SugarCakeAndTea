@@ -1,16 +1,18 @@
 import React, { useState, useEffect } from "react";
-import { Alert, StyleSheet, ToastAndroid, TouchableOpacity, View, SafeAreaView } from "react-native";
+import { Alert, StyleSheet, ToastAndroid, TouchableOpacity, View, SafeAreaView, Linking } from "react-native";
 import { Text, TextInput } from "react-native-paper";
 import auth from "@react-native-firebase/auth";
 import firestore from "@react-native-firebase/firestore";
 import { Image } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import Entypo from 'react-native-vector-icons/Entypo';
 
 const LoginScreen = ({ navigation }) => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
     const [userLogin, setUserLogin] = useState(null);
+    const [loginAttempts, setLoginAttempts] = useState(0);
 
     // Keep your handleLogin function and useEffect hook as they are
     const handleLogin = async () => {
@@ -38,9 +40,11 @@ const LoginScreen = ({ navigation }) => {
                 const userData = userDoc.data();
                 const { state, role } = userData;
                 console.log(userData);
-                if (state === 'Lock') {
+                if (state === 'Blocked') {
                     Alert.alert("Tài khoản đang tạm khóa, vui lòng liên hệ Admin");
                 } else {
+                    // Reset login attempts on successful login
+                    setLoginAttempts(0);
                     setUserLogin(userData);
                     await AsyncStorage.setItem('userEmail', user.email);
                     if (role) { // Check if role is defined
@@ -54,7 +58,34 @@ const LoginScreen = ({ navigation }) => {
                 ToastAndroid.show("Tài khoản không tồn tại. Vui lòng nhập lại!", ToastAndroid.SHORT);
             }
         } catch (error) {
-            ToastAndroid.show("Tài khoản email hoặc mật khẩu không đúng. Vui lòng nhập lại!", ToastAndroid.SHORT);
+            // Increment login attempts
+            const newAttempts = loginAttempts + 1;
+            setLoginAttempts(newAttempts);
+
+            if (newAttempts >= 5) {
+                try {
+                    // Get user document by email
+                    const userDoc = await firestore().collection('USERS').doc(email).get();
+                    
+                    if (userDoc.exists) {
+                        // Update state to Blocked
+                        await firestore().collection('USERS').doc(email).update({
+                            state: 'Blocked'
+                        });
+                        Alert.alert(
+                            "Tài khoản đã bị khóa",
+                            "Bạn đã nhập sai mật khẩu 5 lần. Tài khoản đã bị khóa, vui lòng liên hệ Admin."
+                        );
+                    }
+                } catch (updateError) {
+                    console.error("Error updating user state:", updateError);
+                }
+            } else {
+                ToastAndroid.show(
+                    `Tài khoản email hoặc mật khẩu không đúng. Còn ${5 - newAttempts} lần thử!`,
+                    ToastAndroid.SHORT
+                );
+            }
         }
     };
 
@@ -68,12 +99,39 @@ const LoginScreen = ({ navigation }) => {
         }
     }, [userLogin]);
 
+    const handleSupport = async () => {
+        try {
+            // Mở email hoặc số điện thoại để liên hệ
+            const supportEmail = "2024802010278@student.tdmu.edu.vn?subject"; // Thay thế bằng email hỗ trợ của bạn
+            const supportPhone = "+84xxxxxxxxx"; // Thay thế bằng số điện thoại hỗ trợ của bạn
+            
+            Alert.alert(
+                "Liên hệ hỗ trợ",
+                "Chọn phương thức liên hệ",
+                [
+                    {
+                        text: "Gọi điện",
+                        onPress: () => Linking.openURL(`tel:${supportPhone}`)
+                    },
+                    {
+                        text: "Email",
+                        onPress: () => Linking.openURL(`mailto:${supportEmail}?subject=Yêu cầu mở khóa tài khoản&body=Email cần hỗ trợ: ${email}`)
+                    }
+                ]
+            );
+        } catch (error) {
+            console.error("Error sending support request:", error);
+            ToastAndroid.show("Không thể gửi yêu cầu hỗ trợ. Vui lòng thử lại sau!", ToastAndroid.SHORT);
+        }
+    };
+
     return (
         <SafeAreaView style={styles.container}>
             <View style={styles.content}>
                 <Image
                     style={styles.logo}
                     source={require("../../assets/icon_logo.png")}
+                    resizeMode="contain"
                 />
 
                 <TextInput
@@ -82,8 +140,9 @@ const LoginScreen = ({ navigation }) => {
                     value={email}
                     onChangeText={setEmail}
                     mode="outlined"
-                    outlineColor="#E0E0E0"
+                    outlineColor="#E2E8F0"
                     activeOutlineColor="#3B82F6"
+                    left={<TextInput.Icon icon="email" color="#64748B" />}
                 />
 
                 <TextInput
@@ -93,11 +152,13 @@ const LoginScreen = ({ navigation }) => {
                     onChangeText={setPassword}
                     secureTextEntry={!showPassword}
                     mode="outlined"
-                    outlineColor="#E0E0E0"
+                    outlineColor="#E2E8F0"
                     activeOutlineColor="#3B82F6"
+                    left={<TextInput.Icon icon="lock" color="#64748B" />}
                     right={<TextInput.Icon 
                         icon={showPassword ? "eye-off" : "eye"} 
-                        onPress={() => setShowPassword(!showPassword)} 
+                        onPress={() => setShowPassword(!showPassword)}
+                        color="#64748B"
                     />}
                 />
 
@@ -105,17 +166,28 @@ const LoginScreen = ({ navigation }) => {
                     <Text style={styles.forgotPasswordText}>Quên mật khẩu?</Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity onPress={handleLogin} style={styles.loginButton}>
+                <TouchableOpacity 
+                    onPress={handleLogin} 
+                    style={styles.loginButton}
+                    activeOpacity={0.8}
+                >
                     <Text style={styles.loginButtonText}>Đăng nhập</Text>
                 </TouchableOpacity>
 
                 <View style={styles.registerContainer}>
-                    <Text style={styles.registerText}>Bạn chưa có tài khoản? </Text>
+                    <Text style={styles.registerText}>Bạn chưa có tài khoản?</Text>
                     <TouchableOpacity onPress={() => navigation.navigate("Register")}>
                         <Text style={styles.registerLink}>Đăng ký</Text>
                     </TouchableOpacity>
                 </View>
-                
+
+                <TouchableOpacity 
+                    style={styles.supportButton}
+                    onPress={handleSupport}
+                >
+                    <Entypo name="help-with-circle" size={24} color="#3B82F6" />
+                    <Text style={styles.supportText}>Liên hệ hỗ trợ</Text>
+                </TouchableOpacity>
             </View>
         </SafeAreaView>
     );
@@ -125,51 +197,73 @@ export default LoginScreen;
 
 const styles = StyleSheet.create({
     container: {
-        //flex: 1,
-        backgroundColor: 'white',
+        flex: 1,
+        backgroundColor: '#FFFFFF',
     },
     content: {
-        //flex: 1,
-        padding: 20,
+        flex: 1,
+        padding: 24,
         justifyContent: 'center',
     },
     logo: {
         alignSelf: 'center',
-        height: 200,
-        width: 200,
-        justifyContent: 'center',
-        marginBottom: 40,
+        height: 180,
+        width: 180,
+        marginBottom: 48,
     },
     input: {
-        marginBottom: 15,
-        backgroundColor: 'white',
+        marginBottom: 16,
+        backgroundColor: '#F8FAFC',
+        height: 56,
+        fontSize: 16,
     },
     forgotPasswordText: {
         textAlign: 'right',
         color: '#3B82F6',
-        marginBottom: 20,
+        marginBottom: 24,
+        fontSize: 14,
+        fontWeight: '500',
     },
     loginButton: {
         backgroundColor: '#3B82F6',
-        padding: 15,
-        borderRadius: 5,
+        padding: 16,
+        borderRadius: 12,
         alignItems: 'center',
-        marginBottom: 20,
+        marginBottom: 24,
+        elevation: 2,
     },
     loginButtonText: {
         color: 'white',
         fontSize: 16,
-        fontWeight: 'bold',
+        fontWeight: '600',
     },
     registerContainer: {
         flexDirection: 'row',
         justifyContent: 'center',
+        alignItems: 'center',
+        marginTop: 8,
     },
     registerText: {
-        color: '#666',
+        color: '#64748B',
+        fontSize: 14,
     },
     registerLink: {
         color: '#3B82F6',
-        fontWeight: 'bold',
+        fontWeight: '600',
+        fontSize: 14,
+        marginLeft: 4,
+    },
+    supportButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginTop: 16,
+        padding: 8,
+    },
+    supportText: {
+        color: '#3B82F6',
+        fontSize: 14,
+        fontWeight: '500',
+        marginLeft: 8,
     },
 });

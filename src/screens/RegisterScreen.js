@@ -102,30 +102,43 @@ const RegisterScreen = ({ navigation }) => {
     ];
 
     return (
-        <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : "height"}>
+        <KeyboardAvoidingView 
+            style={{ flex: 1, backgroundColor: '#fff' }} 
+            behavior={Platform.OS === "ios" ? "padding" : "height"}
+        >
             <FlatList
                 contentContainerStyle={styles.container}
                 data={inputFields}
+                ListHeaderComponent={
+                    <View style={styles.titleContainer}>
+                        <Text style={styles.title}>Đăng ký tài khoản</Text>
+                        <Text style={styles.subtitle}>Vui lòng điền đầy đủ thông tin bên dưới</Text>
+                    </View>
+                }
                 renderItem={({ item }) => (
-                    <View>
+                    <View style={styles.inputContainer}>
                         <TextInput
+                            mode="outlined"
                             style={styles.input}
                             label={item.label}
                             value={formData[item.key]}
                             onChangeText={(value) => handleChange(item.key, value)}
+                            error={errors[item.key]}
+                            outlineColor="#E5E7EB"
+                            activeOutlineColor="#3B82F6"
+                            theme={{ roundness: 8 }}
                         />
+                        {errors[item.key] && (
+                            <Text style={styles.errorText}>{errors[item.key]}</Text>
+                        )}
                     </View>
                 )}
-                keyExtractor={(item) => item.key}
-                ListHeaderComponent={
-                    <View style={styles.titleContainer}>
-                        <Text style={styles.title}>Đăng ký tài khoản</Text>
-                    </View>
-                }
                 ListFooterComponent={
-                    <>
+                    <View style={styles.footerContainer}>
                         <DropDownPicker
-                            style={styles.dropdownContainer}
+                            style={styles.dropdown}
+                            containerStyle={styles.dropdownContainer}
+                            dropDownContainerStyle={styles.dropdownList}
                             open={genderPickerOpen}
                             value={formData.gender}
                             items={[
@@ -139,43 +152,75 @@ const RegisterScreen = ({ navigation }) => {
                                 handleChange("gender", value);
                             }}
                             placeholder="Chọn giới tính"
-                            onClose={() => setGenderPickerOpen(false)}
-                            onOpen={() => setGenderPickerOpen(true)}
-                        />
-                        <TextInput
-                            style={styles.input}
-                            label={"Mật khẩu"}
-                            value={formData.password}
-                            onChangeText={(value) => handleChange("password", value)}
-                            secureTextEntry={!showNewPassword}
-                            right={<TextInput.Icon icon={showNewPassword ? "eye-off" : "eye"} onPress={() => setShowNewPassword(!showNewPassword)} />}
-                        />
-                        <Text style={styles.passwordRequirements}>
-                            Mật khẩu ít nhất 8 ký tự và đáp ứng 4 điều kiện sau:
-                            {"\n"}• Các số 0-9. Ví dụ: 2, 6, 7
-                            {"\n"}• Các chữ cái thường (nhỏ) a-z. Ví dụ: a, e, r
-                            {"\n"}• Chữ cái viết hoa (in hoa) A-Z. Ví dụ: A, E, R
-                            {"\n"}• Các ký tự đặc biệt như @#$ 
-                        </Text>
-                        
-                        <TextInput
-                            style={styles.input}
-                            label={"Xác nhận mật khẩu"}
-                            value={formData.confirmpassword}
-                            onChangeText={(value) => handleChange("confirmpassword", value)}
-                            secureTextEntry={!showConfirmPassword}
-                            right={<TextInput.Icon icon={showConfirmPassword ? "eye-off" : "eye"} onPress={() => setShowConfirmPassword(!showConfirmPassword)} />}
+                            placeholderStyle={styles.dropdownPlaceholder}
                         />
                         
-                        <TouchableOpacity onPress={handleCreateAccount} style={styles.button}>
-                            <Text style={{ fontSize: 16, color: 'white' }}>Tạo tài khoản</Text>
-                        </TouchableOpacity>
-                        
-                        <View style={styles.footerView}>
-                            <Text style={styles.footerText}>Bạn đã có tài khoản?</Text>
-                            <Button style={styles.footerLink} onPress={() => navigation.navigate("Login")}>Đăng nhập</Button>
+                        <View style={styles.passwordContainer}>
+                            <TextInput
+                                mode="outlined"
+                                style={styles.input}
+                                label="Mật khẩu"
+                                value={formData.password}
+                                onChangeText={(value) => handleChange("password", value)}
+                                secureTextEntry={!showNewPassword}
+                                right={<TextInput.Icon icon={showNewPassword ? "eye-off" : "eye"} onPress={() => setShowNewPassword(!showNewPassword)} />}
+                                outlineColor="#E5E7EB"
+                                activeOutlineColor="#3B82F6"
+                                theme={{ roundness: 8 }}
+                            />
+                            
+                            <View style={styles.passwordRequirementsContainer}>
+                                <Text style={styles.passwordRequirementsTitle}>Mật khẩu phải bao gồm:</Text>
+                                <View style={styles.requirementItem}>
+                                    <Text style={styles.bulletPoint}>•</Text>
+                                    <Text style={styles.requirementText}>Ít nhất 8 ký tự</Text>
+                                </View>
+                                <View style={styles.requirementItem}>
+                                    <Text style={styles.bulletPoint}>•</Text>
+                                    <Text style={styles.requirementText}>Các số (0-9)</Text>
+                                </View>
+                                <View style={styles.requirementItem}>
+                                    <Text style={styles.bulletPoint}>•</Text>
+                                    <Text style={styles.requirementText}>Chữ thường (a-z)</Text>
+                                </View>
+                                <View style={styles.requirementItem}>
+                                    <Text style={styles.bulletPoint}>•</Text>
+                                    <Text style={styles.requirementText}>Chữ hoa (A-Z)</Text>
+                                </View>
+                                <View style={styles.requirementItem}>
+                                    <Text style={styles.bulletPoint}>•</Text>
+                                    <Text style={styles.requirementText}>Ký tự đặc biệt (@#$)</Text>
+                                </View>
+                            </View>
+
+                            <TextInput
+                                mode="outlined"
+                                style={styles.input}
+                                label="Xác nhận mật khẩu"
+                                value={formData.confirmpassword}
+                                onChangeText={(value) => handleChange("confirmpassword", value)}
+                                secureTextEntry={!showConfirmPassword}
+                                right={<TextInput.Icon icon={showConfirmPassword ? "eye-off" : "eye"} onPress={() => setShowConfirmPassword(!showConfirmPassword)} />}
+                                outlineColor="#E5E7EB"
+                                activeOutlineColor="#3B82F6"
+                                theme={{ roundness: 8 }}
+                            />
                         </View>
-                    </>
+
+                        <TouchableOpacity 
+                            onPress={handleCreateAccount} 
+                            style={styles.button}
+                        >
+                            <Text style={styles.buttonText}>Tạo tài khoản</Text>
+                        </TouchableOpacity>
+
+                        <View style={styles.loginLinkContainer}>
+                            <Text style={styles.loginText}>Bạn đã có tài khoản? </Text>
+                            <TouchableOpacity onPress={() => navigation.navigate("Login")}>
+                                <Text style={styles.loginLink}>Đăng nhập</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
                 }
             />
         </KeyboardAvoidingView>
@@ -184,89 +229,108 @@ const RegisterScreen = ({ navigation }) => {
 
 const styles = StyleSheet.create({
     container: {
-        justifyContent: 'center',
-        alignContent: 'center',
-        paddingBottom: 20,
-        paddingHorizontal: 20,
+        flexGrow: 1,
+        paddingHorizontal: 24,
+        paddingTop: 20,
+        paddingBottom: 40,
     },
     titleContainer: {
-        justifyContent: 'center',
-        alignContent: 'center',
+        marginBottom: 24,
     },
     title: {
-        fontSize: 20,
+        fontSize: 24,
         fontWeight: 'bold',
+        color: '#1F2937',
         textAlign: 'center',
-        marginTop: 20,
+    },
+    subtitle: {
+        fontSize: 14,
+        color: '#6B7280',
+        textAlign: 'center',
+        marginTop: 8,
+    },
+    inputContainer: {
+        marginBottom: 16,
     },
     input: {
-        height: 50,
-        borderRadius: 10,
-        borderTopLeftRadius:10,
-        borderTopRightRadius:10,
-        borderWidth:1,
-        overflow: 'hidden',
-        backgroundColor: 'white',
-        marginTop: 20,
-        paddingLeft: 12,
+        backgroundColor: '#fff',
+        height: 48,
     },
-    button: {
-        backgroundColor: "navy",
-        marginTop: 20,
-        height: 40,
-        borderRadius: 5,
-        alignItems: "center",
-        justifyContent: 'center'
+    errorText: {
+        color: '#EF4444',
+        fontSize: 12,
+        marginTop: 4,
+        marginLeft: 4,
     },
-    footerView: {
-        flexDirection: "row",
-        justifyContent: 'center',
-        alignContent: 'center',
-        marginTop: 10
-    },
-    footerText: {
-        fontSize: 14,
-        color: '#000000',
-        alignSelf: 'center',
-        paddingLeft: 10
-    },
-    footerLink: {
-        color: "navy",
-        fontWeight: "bold",
-        fontSize: 14,
-        paddingLeft: 5
-    },
-    textValidContainer: {
-        flexDirection: 'row',
-        alignSelf: 'flex-start',
-        marginTop: 5,
-        marginBottom: 5,
-    },
-    modalContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: 'white',
-    },
-    modalTitle: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        marginBottom: 20,
-    },
-    closeButton: {
-        backgroundColor: 'navy',
-        padding: 8,
-        borderRadius: 5,
-        marginTop: 20,
+    dropdown: {
+        borderColor: '#E5E7EB',
+        height: 48,
+        borderRadius: 8,
     },
     dropdownContainer: {
-        marginTop: 20,
-
+        marginBottom: 16,
     },
-    passwordRequirements: {
-        marginTop: 10,
+    dropdownList: {
+        borderColor: '#E5E7EB',
+        borderRadius: 8,
+    },
+    dropdownPlaceholder: {
+        color: '#6B7280',
+    },
+    passwordContainer: {
+        gap: 16,
+        marginBottom: 24,
+    },
+    passwordRequirementsContainer: {
+        backgroundColor: '#F3F4F6',
+        padding: 16,
+        borderRadius: 8,
+    },
+    passwordRequirementsTitle: {
         fontSize: 14,
-        color: 'red', // Change color as needed
+        fontWeight: '500',
+        color: '#374151',
+        marginBottom: 8,
+    },
+    requirementItem: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 4,
+    },
+    bulletPoint: {
+        color: '#6B7280',
+        marginRight: 8,
+    },
+    requirementText: {
+        fontSize: 13,
+        color: '#6B7280',
+    },
+    button: {
+        backgroundColor: '#3B82F6',
+        height: 48,
+        borderRadius: 8,
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginBottom: 16,
+    },
+    buttonText: {
+        color: '#fff',
+        fontSize: 16,
+        fontWeight: '600',
+    },
+    loginLinkContainer: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    loginText: {
+        color: '#6B7280',
+        fontSize: 14,
+    },
+    loginLink: {
+        color: '#3B82F6',
+        fontSize: 14,
+        fontWeight: '600',
     },
 });
 
