@@ -54,6 +54,7 @@ const PaymentScreen = ({ navigation }) => {
         items: cartItems,
         address,
         paymentMethod: selectedPaymentMethod,
+        status: selectedPaymentMethod === 'ZaloPay' ? 'completed' : 'confirmed'
       };
 
       // Nếu chọn ZaloPay, khởi tạo thanh toán ZaloPay

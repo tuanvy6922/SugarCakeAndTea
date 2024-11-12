@@ -4,8 +4,8 @@ import React, { useEffect, useState, useContext } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import firestore from "@react-native-firebase/firestore";
 import auth from "@react-native-firebase/auth";
-import Header from '../components/Headers';
-import Slider from '../components/Slider';
+import Header from '../components/Home/Headers';
+import Slider from '../components/Home/Slider';
 import { useNavigation } from '@react-navigation/native';
 
 const { width, height } = Dimensions.get('window');
@@ -20,6 +20,7 @@ const HomeScreen = () => {
   const [selectedCategory, setSelectedCategory] = useState('All'); // Thể loại đã chọn
   const [filteredData, setFilteredData] = useState([]); // Dữ liệu sản phẩm đã lọc
   const navigation = useNavigation(); // Điều hướng giữa các màn hình
+  const [featuredProducts, setFeaturedProducts] = useState([]);
 
   useEffect(() => {
     // Lấy dữ liệu từ Firestore
@@ -29,14 +30,14 @@ const HomeScreen = () => {
         const sliders = querySnapshot.docs.map(doc => doc.data());
         setSliderList(sliders); // Cập nhật danh sách slider
       });
-
+    // Lấy dữ liệu thể loại từ Firestore
     const unsubscribeCategories = firestore()
       .collection('Category')
       .onSnapshot(querySnapshot => {
         const categoriesList = querySnapshot.docs.map(doc => ({ id: doc.id, name: doc.data().name }));
         setCategories([{ name: 'All' }, ...categoriesList]); // Cập nhật danh sách thể loại
       });
-
+    // Lấy dữ liệu sản phẩm từ Firestore
     const unsubscribeProducts = firestore()
       .collection('Product')
       .onSnapshot(querySnapshot => {
@@ -49,6 +50,7 @@ const HomeScreen = () => {
           };
         });
         setData(productsList); // Cập nhật danh sách sản phẩm
+        setFeaturedProducts(productsList.slice(0, 5));
       });
 
     return () => {
@@ -121,7 +123,7 @@ const HomeScreen = () => {
         data={filteredData
           .sort((a, b) => a.index - b.index) // Sắp xếp sản phẩm theo index giảm dần
           .reverse() // Đảo ngược danh sách
-          .slice(0, 4)} // Lấy 4 sản phẩm mới nhất
+          .slice(0, 5)} // Lấy 4 sản phẩm mới nhất
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <TouchableOpacity onPress={() => navigation.navigate('DetailScreen', { product: item })}>
@@ -151,7 +153,7 @@ const HomeScreen = () => {
       <FlatList 
         horizontal
         showsHorizontalScrollIndicator={false}
-        data={filteredData}
+        data={featuredProducts}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <TouchableOpacity onPress={() => navigation.navigate('DetailScreen', { product: item })}>

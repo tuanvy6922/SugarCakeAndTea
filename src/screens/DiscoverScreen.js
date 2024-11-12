@@ -1,13 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  StyleSheet, 
-  Text, 
-  View, 
-  FlatList, 
-  Image, 
-  TouchableOpacity,
-  ActivityIndicator 
-} from 'react-native';
+import { StyleSheet, Text, View, FlatList, Image, TouchableOpacity, ActivityIndicator } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
 import { useNavigation } from '@react-navigation/native';
 import { AntDesign, Entypo } from '@expo/vector-icons';
@@ -47,7 +39,7 @@ const DiscoverScreen = () => {
               }))
               .filter(product => product.purchaseCount > 0) // Chỉ lấy những sản phẩm đã được mua
               .sort((a, b) => b.purchaseCount - a.purchaseCount) // Sắp xếp theo số lượng bán giảm dần
-              .slice(0, 10); // Lấy top 10
+              .slice(0, 6); // Lấy top 10
 
             setTopProducts(productsData);
             setLoading(false);

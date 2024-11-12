@@ -18,7 +18,7 @@ export default function Header() {
         position: 'relative'
       }}>
         <Image 
-          source={require('../../assets/title.png')} 
+          source={require('../../../assets/title.png')} 
           style={{ width: width*0.6, height: height*0.04 }}
         />
       </View>
