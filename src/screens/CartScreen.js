@@ -1,6 +1,6 @@
 // src/screens/CartScreen.js
-import { StyleSheet, Text, View, TouchableOpacity, Image, ScrollView, Dimensions } from 'react-native';
-import React, { useContext } from 'react';
+import { StyleSheet, Text, View, TouchableOpacity, Image, ScrollView, Dimensions, TextInput, Alert, Platform } from 'react-native';
+import React, { useContext, useState } from 'react';
 import EmptyListAnimation from '../components/EmptyListAnimation';
 import { CartContext } from '../components/CartContext'; // Import CartContext
 import { useNavigation } from '@react-navigation/native';
@@ -8,7 +8,16 @@ import { useNavigation } from '@react-navigation/native';
 const { width, height } = Dimensions.get('window') 
 
 const CartScreen = () => {
-  const { cartItems, removeFromCart, addToCart, removeAllFromCart } = useContext(CartContext); // Lấy cartItems từ CartContext
+  const { 
+    cartItems, 
+    removeFromCart, 
+    addToCart, 
+    removeAllFromCart,
+    applyVoucher,
+    removeVoucher,
+    appliedVoucher 
+  } = useContext(CartContext);
+  const [voucherCode, setVoucherCode] = useState('');
   const navigation = useNavigation();
   
   const handlePaymentPress = () => {
@@ -17,9 +26,26 @@ const CartScreen = () => {
     }
   };
 
+  const handleApplyVoucher = async () => {
+    if (!voucherCode.trim()) {
+      Alert.alert('Thông báo', 'Vui lòng nhập mã giảm giá');
+      return;
+    }
+
+    const result = await applyVoucher(voucherCode);
+    Alert.alert('Thông báo', result.message);
+    if (result.success) {
+      setVoucherCode('');
+    }
+  };
+
+  const cartTotal = cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);//tổng giá trị giỏ hàng
+  const discount = appliedVoucher ? cartTotal * appliedVoucher.discount : 0;//tính giá trị giảm giá
+  const finalTotal = cartTotal - discount;//tính giá trị thanh toán
+
   return (
     <View style={styles.container}>
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         {cartItems.length > 0 ? ( 
           cartItems.map((item, index) => (
             <View key={index} style={styles.itemContainer}>
@@ -66,10 +92,51 @@ const CartScreen = () => {
           </View>
         )}
       </ScrollView>
-      <View style={styles.totalContainer}>
-        <Text style={styles.totalText}>
-          Tổng: {cartItems.reduce((total, item) => total + (item.price * item.quantity), 0).toLocaleString('en-US')} VND
-        </Text>
+
+      <View style={styles.summaryContainer}>
+        <View style={styles.voucherContainer}>
+          <TextInput
+            style={styles.voucherInput}
+            placeholder="Nhập mã giảm giá"
+            value={voucherCode}
+            onChangeText={setVoucherCode}
+          />
+          <TouchableOpacity 
+            style={styles.voucherButton} 
+            onPress={handleApplyVoucher}
+          >
+            <Text style={styles.voucherButtonText}>Áp dụng</Text>
+          </TouchableOpacity>
+        </View>
+
+        {appliedVoucher && (
+          <View style={styles.discountContainer}>
+            <View style={styles.discountRow}>
+              <Text style={styles.summaryLabel}>Tạm tính:</Text>
+              <Text style={styles.summaryValue}>{cartTotal.toLocaleString('en-US')} VND</Text>
+            </View>
+            <View style={styles.discountRow}>
+              <Text style={styles.discountLabel}>
+                Giảm giá ({appliedVoucher.discount * 100}%):
+              </Text>
+              <Text style={styles.discountValue}>
+                -{discount.toLocaleString('en-US')} VND
+              </Text>
+            </View>
+            <TouchableOpacity 
+              style={styles.removeVoucherButton} 
+              onPress={removeVoucher}
+            >
+              <Text style={styles.removeVoucherText}>Xóa mã giảm giá</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+        
+        <View style={styles.totalRow}>
+          <Text style={styles.totalLabel}>Tổng thanh toán:</Text>
+          <Text style={styles.totalValue}>{finalTotal.toLocaleString('en-US')} VND</Text>
+        </View>
+
         <TouchableOpacity
           style={[styles.payButton, cartItems.length === 0 && styles.disabledPayButton]}
           onPress={handlePaymentPress}
@@ -85,7 +152,12 @@ const CartScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: width * 0.05 ,
+    backgroundColor: '#fff',
+    paddingBottom: 60,
+  },
+  scrollView: {
+    flex: 1,
+    padding: width * 0.05,
   },
   itemContainer: {
     padding: 10,
@@ -227,13 +299,11 @@ const styles = StyleSheet.create({
   },
   payButton: {
     backgroundColor: '#D17842',
-    borderRadius: 5,
-    paddingHorizontal:20,
-    paddingVertical:12,
+    borderRadius: 8,
+    paddingVertical: 12,
+    alignItems: 'center',
     marginTop: 5,
-    paddingLeft:40,
-    paddingRight:40,
-    marginLeft:30,
+    marginBottom: Platform.OS === 'ios' ? 20 : 10,
   },
   payButtonText: {
     color: '#fff',
@@ -267,6 +337,105 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
     marginTop: 10,
+  },
+  voucherContainer: {
+    flexDirection: 'row',
+    paddingHorizontal: 15,
+    gap: 10,
+  },
+  voucherInput: {
+    flex: 1,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 5,
+    padding: 10,
+    backgroundColor: '#fff',
+  },
+  voucherButton: {
+    backgroundColor: '#D17842',
+    borderRadius: 5,
+    padding: 10,
+    justifyContent: 'center',
+  },
+  voucherButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+  },
+  discountInfo: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    width: '100%',
+    paddingHorizontal: 15,
+    marginBottom: 5,
+  },
+  discountText: {
+    color: '#D17842',
+    fontWeight: 'bold',
+  },
+  removeVoucherText: {
+    color: '#DC3535',
+    fontWeight: 'bold',
+  },
+  summaryContainer: {
+    backgroundColor: '#fff',
+    paddingHorizontal: 15,
+    paddingTop: 10,
+    paddingBottom: Platform.OS === 'ios' ? 30 : 20,
+    borderTopWidth: 1,
+    borderTopColor: '#eee',
+  },
+  discountContainer: {
+    marginBottom: 10,
+  },
+  discountRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 5,
+  },
+  summaryLabel: {
+    fontSize: 16,
+    color: '#000',
+    fontWeight: 'bold',
+  },
+  summaryValue: {
+    fontSize: 16,
+    color: '#DC3535',
+    fontWeight: 'bold',
+  },
+  discountLabel: {
+    fontSize: 16,
+    color: '#D17842',
+    fontWeight: 'bold',
+  },
+  discountValue: {
+    fontSize: 16,
+    color: '#D17842',
+    fontWeight: 'bold',
+  },
+  removeVoucherButton: {
+    fontSize: 16,
+    color: '#DC3535',
+    fontWeight: 'bold',
+  },
+  totalRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 10,
+    borderTopWidth: 1,
+    borderTopColor: '#eee',
+  },
+  totalLabel: {
+    fontSize: 16,
+    color: '#000',
+    fontWeight: 'bold',
+  },
+  totalValue: {
+    fontSize: 16,
+    color: '#DC3535',
+    fontWeight: 'bold',
   },
 });
 

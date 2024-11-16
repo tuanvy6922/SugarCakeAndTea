@@ -1,4 +1,5 @@
 import React, { createContext, useState } from 'react';
+import { firebase } from '@react-native-firebase/firestore';
 
 // Tạo context cho giỏ hàng
 export const CartContext = createContext();
@@ -6,6 +7,7 @@ export const CartContext = createContext();
 // Tạo provider cho giỏ hàng
 export const CartProvider = ({ children }) => {
   const [cartItems, setCartItems] = useState([]); // Khởi tạo giỏ hàng rỗng
+  const [appliedVoucher, setAppliedVoucher] = useState(null);
 
   // Hàm thêm sản phẩm vào giỏ hàng
   const addToCart = (item) => {
@@ -46,8 +48,63 @@ export const CartProvider = ({ children }) => {
     setCartItems([]);
   };
 
+  const applyVoucher = async (code) => {
+    try {
+      const vouchersRef = firebase.firestore().collection('Vouchers');
+      const snapshot = await vouchersRef
+        .where('code', '==', code)
+        .where('isActive', '==', true)
+        .get();
+
+      if (snapshot.empty) {
+        return { success: false, message: 'Mã giảm giá không hợp lệ' };
+      }
+
+      const voucherData = snapshot.docs[0].data();
+      const now = Date.now();
+
+      if (now < voucherData.startDate || now > voucherData.endDate) {
+        return { success: false, message: 'Mã giảm giá đã hết hạn' };
+      }
+
+      const cartTotal = cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
+      if (cartTotal < voucherData.minimumAmount) {
+        return { 
+          success: false, 
+          message: `Đơn hàng tối thiểu ${voucherData.minimumAmount.toLocaleString('en-US')} VND` 
+        };
+      }
+
+      setAppliedVoucher(voucherData);
+      return { success: true, message: 'Áp dụng mã giảm giá thành công' };
+    } catch (error) {
+      console.error('Lỗi khi áp dụng voucher:', error);
+      return { success: false, message: 'Đã có lỗi xảy ra' };
+    }
+  };
+
+  const removeVoucher = () => {
+    setAppliedVoucher(null);
+  };
+
+  const getFinalTotal = () => {
+    const cartTotal = cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
+    const discount = appliedVoucher ? cartTotal * appliedVoucher.discount : 0;
+    return cartTotal - discount;
+  };
+
   return (
-    <CartContext.Provider value={{ cartItems, addToCart, removeFromCart, removeAllFromCart, clearCart }}>
+    <CartContext.Provider value={{ 
+      cartItems, 
+      addToCart, 
+      removeFromCart, 
+      removeAllFromCart, 
+      clearCart,
+      applyVoucher,
+      removeVoucher,
+      appliedVoucher,
+      getFinalTotal
+    }}>
       {children}
     </CartContext.Provider>
   );

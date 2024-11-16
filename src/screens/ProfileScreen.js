@@ -127,6 +127,11 @@ const ProfileScreen = ({ navigation }) => {
             <Entypo name="edit" size={16} color="#333" style={styles.icon} />
           </TouchableOpacity>
 
+          <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('ChatBot')}>
+            <Text style={styles.buttonText}>Tư vấn sản phẩm</Text>
+            <Entypo name="light-bulb" size={16} color="#333" style={styles.icon} />
+          </TouchableOpacity>
+
           <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('FavoriteScreen')}>
             <Text style={styles.buttonText}>Danh sách yêu thích</Text>
             <Entypo name="heart" size={16} color="#333" style={styles.icon} />
@@ -170,6 +175,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f0f0f0',
+    paddingBottom: 200,
   },
   card: {
     width: width*0.9,

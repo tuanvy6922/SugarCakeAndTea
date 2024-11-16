@@ -20,7 +20,7 @@ const config = {
 const PaymentScreen = ({ navigation }) => {
   const [address, setAddress] = useState('');
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(null);
-  const { cartItems, clearCart } = useContext(CartContext);
+  const { cartItems, clearCart, getFinalTotal, appliedVoucher } = useContext(CartContext);
 
   const handlePayment = async () => {
     if (!address) {
@@ -39,13 +39,13 @@ const PaymentScreen = ({ navigation }) => {
         return;
       }
 
-      // Lấy thông tin người dùng từ collection USERS
       const userDoc = await firestore()
         .collection('USERS')
         .doc(user.email)
         .get();
 
       const userData = userDoc.data();
+      const finalTotal = getFinalTotal();
 
       const bill = {
         user: user.email,
@@ -54,26 +54,30 @@ const PaymentScreen = ({ navigation }) => {
         items: cartItems,
         address,
         paymentMethod: selectedPaymentMethod,
-        status: selectedPaymentMethod === 'ZaloPay' ? 'completed' : 'confirmed'
+        status: selectedPaymentMethod === 'ZaloPay' ? 'cancelled' : 'confirmed',
+        totalAmount: finalTotal,
+        voucherCode: appliedVoucher ? appliedVoucher.code : "Không có",
+        voucherDiscount: appliedVoucher ? appliedVoucher.discount : 0
       };
 
-      // Nếu chọn ZaloPay, khởi tạo thanh toán ZaloPay
       if (selectedPaymentMethod === 'ZaloPay') {
         const paymentSuccess = await initiateZaloPayment(bill);
         if (paymentSuccess) {
-          // Chỉ thêm hóa đơn vào Firestore nếu thanh toán thành công
-          await firestore().collection('Bills').add(bill);
-          clearCart(); // Xóa sản phẩm trong giỏ hàng đã thanh toán
-          navigation.navigate('Bill-nav'); // Điều hướng đến màn hình hóa đơn
+          const billRef = await firestore().collection('Bills').add(bill);
+          await billRef.update({
+            status: 'completed'
+          });
+          clearCart();
+          navigation.navigate('Bill-nav');
         }
       } else {
-        // Xử lý thanh toán bằng tiền mặt
-        await firestore().collection('Bills').add(bill); // Tạo hóa đơn ngay lập tức
-        clearCart(); // Xóa sản phẩm trong giỏ hàng đã thanh toán
+        await firestore().collection('Bills').add(bill);
+        clearCart();
         Alert.alert('Thông báo','Đơn hàng của bạn đã được xác nhận');
-        navigation.navigate('Bill-nav'); // Điều hướng đến màn hình hóa đơn
+        navigation.navigate('Bill-nav');
       }
     } catch (error) {
+      console.error('Payment Error:', error);
       Alert.alert('Lỗi', 'Có lỗi xảy ra khi lưu hóa đơn.');
     }
   };
@@ -81,14 +85,13 @@ const PaymentScreen = ({ navigation }) => {
   const initiateZaloPayment = async (bill) => {
     try {
       const app_trans_id = moment().format('YYMMDDHHmmss') + '_' + bill.user.split('@')[0];
-      const totalAmount = bill.items.reduce((total, item) => total + (item.price * item.quantity), 0);
 
       const order = {
         app_id: 2553,
         app_user: bill.user.split('@')[0],
         app_trans_id: app_trans_id,
         app_time: Date.now(),
-        amount: totalAmount,
+        amount: bill.totalAmount,
         item: JSON.stringify(bill.items.map(item => ({
           itemid: item.id,
           itemname: item.name,
@@ -118,15 +121,15 @@ const PaymentScreen = ({ navigation }) => {
       
       if (responseData.return_code === 1 && responseData.order_url) {
         await Linking.openURL(responseData.order_url);
-        return true; // Trả về true nếu thanh toán thành công
+        return true;
       } else {
         Alert.alert('Error', 'Payment initiation failed!');
-        return false; // Trả về false nếu thanh toán không thành công
+        return false;
       }
     } catch (error) {
       console.error('Payment Error:', error);
       Alert.alert('Error', 'An error occurred during payment.');
-      return false; // Trả về false nếu có lỗi
+      return false;
     }
   };
 

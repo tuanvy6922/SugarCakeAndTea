@@ -34,11 +34,6 @@ const OrderHistoryScreen = ({ navigation }) => {
   }, []);
 
   const renderItem = ({ item }) => {
-    const totalAmount = item.items.reduce((total, product) => {
-      const price = parseFloat(product.price) || 0;
-      return total + (price * product.quantity);
-    }, 0);
-
     // Tạo một bản sao của item và chuyển đổi date thành string
     const orderData = {
       ...item,
@@ -57,7 +52,7 @@ const OrderHistoryScreen = ({ navigation }) => {
         <Text style={styles.billText}>Địa chỉ: {item.address}</Text>
         <View style={styles.totalContainer}>
           <Text style={styles.totalText}>
-            Tổng tiền: {Number(totalAmount.toFixed(0)).toLocaleString('en-US')} VND
+            Tổng tiền: {Number(item.totalAmount).toLocaleString('en-US')} VND
           </Text>
           <View style={styles.detailContainer}>
             <Text style={styles.detailText}>Xem chi tiết</Text>

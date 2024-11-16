@@ -13,7 +13,6 @@ const { width, height } = Dimensions.get('window');
 const HomeScreen = () => {
   // Khởi tạo các state để quản lý dữ liệu
   const [sliderList, setSliderList] = useState([]); // Danh sách slider
-  const [currentSlide, setCurrentSlide] = useState(0); // Slide hiện tại
   const [data, setData] = useState([]); // Dữ liệu sản phẩm
   const user = auth().currentUser; // Người dùng hiện tại
   const [categories, setCategories] = useState([]); // Danh sách thể loại
@@ -61,14 +60,6 @@ const HomeScreen = () => {
     };
   }, []);
 
-  // Tự động chuyển slide sau mỗi 5 giây
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentSlide((prevSlide) => (prevSlide + 1) % sliderList.length);
-    }, 5000);
-    return () => clearInterval(interval); // Dọn dẹp interval khi component bị hủy
-  }, [sliderList]);
-
   const handleCategoryPress = (category) => {
     // Xử lý khi người dùng nhấn vào thể loại
     if (category.name === 'All') {
@@ -99,7 +90,7 @@ const HomeScreen = () => {
       {/* <Header /> */}
       <Header />
       {/* Slider */ }
-      <Slider sliderList={sliderList} currentSlide={currentSlide} />
+      {sliderList.length > 0 && <Slider sliderList={sliderList} />}
       {/* Category */}
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.categoryScrollView}>
         {categories.map((category, index) => (

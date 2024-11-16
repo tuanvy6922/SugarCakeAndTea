@@ -9,16 +9,22 @@ export default function Slider({ sliderList }) {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      if (!isAutoScrolling.current) {
+      if (!isAutoScrolling.current && sliderList.length > 0) {
         setCurrentSlide(prevSlide => {
           const nextSlide = (prevSlide + 1) % sliderList.length;
-          flatListRef.current.scrollToIndex({ animated: true, index: nextSlide });
+          if (flatListRef.current && typeof nextSlide === 'number') {
+            flatListRef.current.scrollToIndex({ 
+              animated: true, 
+              index: nextSlide,
+              viewPosition: 0
+            });
+          }
           return nextSlide;
         });
       }
-    }, 3000); // 3000ms = 3s
+    }, 3000);
 
-    return () => clearInterval(interval); // Clear interval on component unmount
+    return () => clearInterval(interval);
   }, [sliderList.length]);
 
   const handleScrollEnd = (event) => {

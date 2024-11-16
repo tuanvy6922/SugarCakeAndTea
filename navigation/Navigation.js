@@ -10,7 +10,7 @@ import ForgotPassword from '../src/screens/ForgotPassword';
 import ItemList from '../src/screens/ItemList';
 import PaymentScreen from '../src/screens/PaymentScreen';
 import StoreLocationScreen from '../src/screens/StoreLocationScreen';
-
+import ChatBot from '../src/screens/ChatBot';
 
 const Stack = createNativeStackNavigator();
 
@@ -28,6 +28,7 @@ const Navigation = () => {
           headerTitle: "Quên mật khẩu"
         }} />
         <Stack.Screen name="StoreLocationScreen" component={StoreLocationScreen} options={{headerShown: false}}/>
+        <Stack.Screen name="ChatBot" component={ChatBot} options={{headerShown: false}}/>
       </Stack.Navigator>
     </NavigationContainer>
   );

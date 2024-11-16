@@ -102,8 +102,8 @@ const LoginScreen = ({ navigation }) => {
     const handleSupport = async () => {
         try {
             // Mở email hoặc số điện thoại để liên hệ
-            const supportEmail = "2024802010278@student.tdmu.edu.vn?subject"; // Thay thế bằng email hỗ trợ của bạn
-            const supportPhone = "+84xxxxxxxxx"; // Thay thế bằng số điện thoại hỗ trợ của bạn
+            const supportEmail = "2024802010278@student.tdmu.edu.vn"; // Thay thế bằng email hỗ trợ của bạn
+            const supportPhone = "0898425843"; // Thay thế bằng số điện thoại hỗ trợ của bạn
             
             Alert.alert(
                 "Liên hệ hỗ trợ",
@@ -119,6 +119,7 @@ const LoginScreen = ({ navigation }) => {
                     }
                 ]
             );
+            console.log(supportEmail);
         } catch (error) {
             console.error("Error sending support request:", error);
             ToastAndroid.show("Không thể gửi yêu cầu hỗ trợ. Vui lòng thử lại sau!", ToastAndroid.SHORT);

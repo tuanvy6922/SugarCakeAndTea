@@ -12,11 +12,6 @@ const OrderDetailScreen = ({ route }) => {
 
   const { order } = route.params;
 
-  const totalAmount = order.items.reduce((total, product) => {
-    const price = parseFloat(product.price) || 0;
-    return total + (price * product.quantity);
-  }, 0);
-
   return (
     <ScrollView style={styles.container}>
       <View style={styles.billContainer}>
@@ -54,9 +49,23 @@ const OrderDetailScreen = ({ route }) => {
           ))}
         </View>
 
-        <Text style={styles.totalText}>
-          Tổng tiền: {Number(totalAmount.toFixed(0)).toLocaleString('en-US')} VND
-        </Text>
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Chi tiết thanh toán</Text>
+          <Text style={styles.billText}>Tổng tiền: {Number(order.totalAmount).toLocaleString('en-US')} VND</Text>
+          
+          {/* Hiển thị thông tin voucher */}
+          <View style={styles.voucherInfo}>
+            <Text style={[
+              styles.voucherText,
+              order.voucherCode !== "Không có" ? styles.hasVoucherText : styles.noVoucherText
+            ]}>
+              {order.voucherCode !== "Không có" 
+                ? `Đã áp dụng mã giảm giá: ${order.voucherCode} (${order.voucherDiscount * 100}%)`
+                : `Mã giảm giá: ${order.voucherCode}`
+              }
+            </Text>
+          </View>
+        </View>
       </View>
     </ScrollView>
   );
@@ -80,6 +89,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
     elevation: 5,
+    marginBottom: 60,
   },
   billHeader: {
     fontSize: 24,
@@ -155,6 +165,23 @@ const styles = StyleSheet.create({
     marginTop: 20,
     color: '#D17842',
   },
+  voucherInfo: {
+    marginTop: 10,
+    padding: 10,
+    backgroundColor: '#f8f8f8',
+    borderRadius: 5,
+    borderLeftWidth: 3,
+    borderLeftColor: '#D17842',
+  },
+  voucherText: {
+    fontStyle: 'italic',
+  },
+  hasVoucherText: {
+    color: '#D17842',
+  },
+  noVoucherText: {
+    color: '#666',
+  }
 });
 
 export default OrderDetailScreen;

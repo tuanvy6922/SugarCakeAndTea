@@ -1,0 +1,135 @@
+{
+  "greetings": {
+    "patterns": [
+      "xin chào", "hello", "hi", "chào", "hey", "alo", "chào bạn", 
+      "chào shop", "có ai không", "tư vấn", "cho hỏi", "shop ơi",
+      "bên shop", "cửa hàng", "quán", "bên mình"
+    ],
+    "responses": [
+      "Xin chào quý khách! Em là trợ lý ảo của cửa hàng. Em có thể giúp gì cho bạn ạ?",
+      "Chào bạn! Em rất vui được hỗ trợ bạn. Bạn cần tư vấn về sản phẩm nào ạ?",
+      "Xin chào! Em là bot tư vấn của cửa hàng. Bạn muốn tìm hiểu về sản phẩm nào ạ?"
+    ]
+  },
+  "product_info": {
+    "patterns": [
+      "menu", "sản phẩm", "có những gì", "bánh", "trà", "đồ uống",
+      "món nào", "loại nào", "danh sách", "bán những gì",
+      "có gì", "món mới", "bestseller", "bán chạy", "nổi bật",
+      "đặc biệt", "signature", "recommend", "gợi ý", "phổ biến",
+      "bánh ngọt", "pastry", "cake", "coffee", "cà phê", "thức uống"
+    ],
+    "responses": [
+      "Dạ, cửa hàng chúng em có các nhóm sản phẩm sau ạ:\n1. Các loại bánh (Cake, Pastry)\n2. Trà và đồ uống\nBạn muốn tìm hiểu về nhóm sản phẩm nào ạ?",
+      "Cửa hàng có đa dạng các loại bánh và đồ uống ạ. Một số sản phẩm nổi bật:\n- Bánh: Tiramisu, Red Velvet, Matcha Cake\n- Đồ uống: Trà sữa, Trà hoa quả, Cafe\nBạn quan tâm đến loại nào ạ?"
+    ]
+  },
+  "price_inquiry": {
+    "patterns": [
+      "giá", "bao nhiêu", "price", "chi phí", "đắt không",
+      "rẻ không", "giá cả", "bảng giá", "báo giá",
+      "giá tiền", "thanh toán", "tổng", "tiền", "phí",
+      "giá thành", "định giá", "giá bao nhiêu"
+    ],
+    "responses": [
+      "Dạ, mỗi sản phẩm có 3 size với mức giá khác nhau ạ:\n- Size S: 45.000đ - 65.000đ\n- Size M: 55.000đ - 75.000đ\n- Size L: 65.000đ - 85.000đ\nBạn muốn biết giá cụ thể của sản phẩm nào ạ?",
+      "Dạ, giá các sản phẩm của cửa hàng dao động từ 45.000đ đến 85.000đ tùy size và loại ạ. Bạn quan tâm đến sản phẩm nào để em báo giá chi tiết ạ?"
+    ]
+  },
+  "size_info": {
+    "patterns": [
+      "size", "kích cỡ", "cỡ", "lớn", "nhỏ", "vừa",
+      "phần", "khẩu phần", "nhiều", "ít", "bao nhiêu người ăn",
+      "mấy người", "phù hợp", "dùng cho", "size nào",
+      "kích thước", "phần ăn", "suất"
+    ],
+    "responses": [
+      "Dạ, cửa hàng có 3 size phù hợp với nhiều nhu cầu ạ:\n- Size S: Phù hợp 1-2 người\n- Size M: Phù hợp 2-4 người\n- Size L: Phù hợp 4-6 người hoặc cho tiệc nhỏ",
+      "Dạ, mỗi size có khẩu phần khác nhau ạ:\n- Size S: Cho 1-2 người dùng\n- Size M: Cho nhóm nhỏ 2-4 người\n- Size L: Cho nhóm 4-6 người\nBạn đi bao nhiêu người để em tư vấn size phù hợp ạ?"
+    ]
+  },
+  "promotion_inquiry": {
+    "patterns": [
+      "khuyến mãi", "giảm giá", "ưu đãi", "sale", "discount",
+      "voucher", "mã giảm", "quà tặng", "khuyến mại", 
+      "đang có chương trình", "special offer", "giảm",
+      "ưu đãi gì", "chương trình khuyến mãi"
+    ],
+    "responses": [
+      "Dạ, hiện cửa hàng đang có chương trình giảm 10% cho khách hàng mới ạ. Bạn có muốn tìm hiểu thêm về chương trình này không ạ?",
+      "Dạ, cửa hàng có ưu đãi đặc biệt dành cho khách hàng mới với voucher giảm 10% ạ. Bạn có muốn biết thêm chi tiết không ạ?"
+    ]
+  },
+  "store_location": {
+    "patterns": [
+      "địa chỉ", "ở đâu", "chỗ nào", "location", "cửa hàng ở đâu",
+      "quán ở đâu", "đường nào", "khu vực nào", "vị trí",
+      "tới đường nào", "địa điểm", "tìm đường", "chỉ đường"
+    ],
+    "responses": [
+      "Dạ, cửa hàng chúng em tọa lạc tại [địa chỉ cụ thể của cửa hàng]. Bạn có thể ghé thăm từ 7h sáng đến 22h tối hàng ngày ạ.",
+      "Dạ, quý khách có thể ghé cửa hàng tại [địa chỉ]. Cửa hàng mở cửa từ 7h sáng đến 22h tối mỗi ngày ạ."
+    ]
+  },
+  "cake_questions": {
+    "patterns": [
+      "bánh có ngọt không", "bánh có béo không", "bánh có mềm không",
+      "bánh tươi không", "bánh để được mấy ngày", "bánh có bị khô không",
+      "bánh có bị đông không", "bánh có nhiều kem không", "bánh có ngậy không",
+      "bánh có dẻo không", "bánh có xốp không", "bánh có nặng không",
+      "bánh có phù hợp người ăn kiêng", "bánh có phù hợp trẻ em",
+      "bánh có lactose không", "bánh có gluten không", "bánh có trứng không",
+      "bánh có sữa không", "bánh có bơ không", "bánh có whipping cream không",
+      "bánh có nhân không", "bánh có lớp không", "bánh có phủ socola không"
+    ],
+    "responses": [
+      "Dạ, về bánh của cửa hàng:\n- Độ ngọt vừa phải, không gây ngấy\n- Sử dụng kem tươi tự nhiên\n- Bảo quản tủ lạnh được 2-3 ngày\n- Có thể điều chỉnh độ ngọt theo yêu cầu\nBạn quan tâm đến loại bánh nào để em tư vấn cụ thể ạ?",
+      "Dạ, bánh của cửa hàng:\n- Được làm từ nguyên liệu tươi mới mỗi ngày\n- Kết cấu mềm mịn, không khô cứng\n- Phù hợp với nhiều đối tượng\nBạn muốn biết thêm thông tin gì về bánh không ạ?"
+    ]
+  },
+  "beverage_questions": {
+    "patterns": [
+      "nước có đá không", "nước có đường không", "nước có caffeine không",
+      "trà có đặc không", "trà có túi lọc không", "trà có mạnh không",
+      "đồ uống có nóng không", "có cho thêm đường không", "có cho thêm sữa không",
+      "có dùng sữa tươi không", "có dùng sữa đặc không", "có topping không",
+      "có thêm trân châu không", "có thạch không", "có pudding không",
+      "có nước ép không", "có sinh tố không", "có smoothie không",
+      "có đồ uống không caffeine không", "có đồ uống không đường không",
+      "có đồ uống nóng không", "có đồ uống lạnh không"
+    ],
+    "responses": [
+      "Dạ, về đồ uống của cửa hàng:\n- Có thể điều chỉnh đá, đường theo yêu cầu\n- Sử dụng nguyên liệu tự nhiên\n- Có cả đồ uống nóng và lạnh\n- Có option không đường cho người ăn kiêng\nBạn muốn thử loại đồ uống nào ạ?",
+      "Dạ, đồ uống của cửa hàng:\n- Được pha chế theo công thức riêng\n- Có thể tùy chỉnh theo khẩu vị\n- Đảm bảo vệ sinh an toàn thực phẩm\nBạn thích uống đồ nóng hay lạnh ạ?"
+    ]
+  },
+  "coffee_questions": {
+    "patterns": [
+      "cà phê có đắng không", "cà phê có mạnh không", "cà phê có rang không",
+      "cà phê robusta hay arabica", "cà phê xay hay pha phin",
+      "cà phê espresso không", "cà phê có sữa không", "cà phê đen không",
+      "cà phê có ngọt không", "cà phê có béo không", "cà phê có đặc không",
+      "cà phê có bột không", "cà phê có chua không", "cà phê có thơm không",
+      "cà phê có đá không", "cà phê có nóng không", "cà phê pha máy không",
+      "cà phê pha phin không", "cà phê có nhiều caffeine không"
+    ],
+    "responses": [
+      "Dạ, về cà phê của cửa hàng:\n- Sử dụng hạt cà phê rang xay mới\n- Có thể pha theo nhiều phương pháp\n- Hương vị đậm đà, không quá đắng\n- Có thể thêm sữa hoặc uống đen\nBạn thích uống cà phê kiểu nào ạ?",
+      "Dạ, cà phê của cửa hàng:\n- Được tuyển chọn từ nguồn hạt chất lượng\n- Rang mức medium để giữ hương vị cân bằng\n- Có thể điều chỉnh độ đậm nhạt\nBạn muốn thử loại cà phê nào ạ?"
+    ]
+  },
+  "dessert_questions": {
+    "patterns": [
+      "tráng miệng có ngọt không", "tráng miệng có lạnh không",
+      "tráng miệng có béo không", "tráng miệng có nhiều không",
+      "tráng miệng có đá không", "tráng miệng có kem không",
+      "tráng miệng có trái cây không", "có pudding không",
+      "có bánh flan không", "có caramen không", "có panna cotta không",
+      "có chè không", "có yaourt không", "có mousse không"
+    ],
+    "responses": [
+      "Dạ, về món tráng miệng của cửa hàng:\n- Được làm mới mỗi ngày\n- Độ ngọt vừa phải\n- Sử dụng nguyên liệu tự nhiên\n- Phù hợp dùng sau bữa ăn\nBạn muốn thử món tráng miệng nào ạ?",
+      "Dạ, các món tráng miệng của cửa hàng:\n- Đa dạng hương vị\n- Được trang trí đẹp mắt\n- Phù hợp mọi lứa tuổi\nBạn thích món tráng miệng kiểu gì ạ?"
+    ]
+  }
+} 

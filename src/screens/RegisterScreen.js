@@ -69,6 +69,7 @@ const RegisterScreen = ({ navigation }) => {
         }
 
         try {
+            console.log("Đang tạo tài khoản với dữ liệu:", formData);
             // Nếu email chưa tồn tại, tiếp tục tạo tài khoản
             const emailExists = await checkEmailExists(formData.email);
             if (emailExists) {
