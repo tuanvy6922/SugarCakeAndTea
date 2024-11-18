@@ -10,7 +10,7 @@ const FavoritesScreen = () => {
   const user = auth().currentUser;
 
   useEffect(() => {
-    const fetchFavorites = async () => {
+    const fetchFavorites = async () => {//lấy danh sách sản phẩm yêu thích
       if (user) {
         const favoriteRef = firestore().collection('USERS').doc(user.email).collection('Favorite');
         const snapshot = await favoriteRef.get();
@@ -22,7 +22,7 @@ const FavoritesScreen = () => {
     fetchFavorites();
   }, [user]);
 
-  const handleRemoveFavorite = async (itemId) => {
+  const handleRemoveFavorite = async (itemId) => {//xóa sản phẩm yêu thích
     const favoriteRef = firestore().collection('USERS').doc(user.email).collection('Favorite').doc(itemId);
     await favoriteRef.delete();
     removeFavorite(itemId);
@@ -42,7 +42,7 @@ const FavoritesScreen = () => {
               <Image source={{ uri: item.image }} style={styles.favoriteImage} />
               <View style={styles.favoriteInfo}>
                 <View style={styles.favoriteNameContainer}>
-                  <Text style={styles.favoriteName}>{item.name}</Text>
+                  <Text style={styles.favoriteName} numberOfLines={1}>{item.name.substring(0, 20)}...</Text>
                   <TouchableOpacity onPress={() => handleRemoveFavorite(item.id)}>
                     <Entypo name="heart" size={28} color="red" />
                   </TouchableOpacity>

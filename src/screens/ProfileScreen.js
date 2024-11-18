@@ -46,6 +46,7 @@ const ProfileScreen = ({ navigation }) => {
       await AsyncStorage.removeItem('userEmail');
       await AsyncStorage.removeItem('userRole');
       await AsyncStorage.removeItem('userState');
+      await AsyncStorage.removeItem('userCode');
       setUserData(null);
 
       // Thông báo cho người dùng

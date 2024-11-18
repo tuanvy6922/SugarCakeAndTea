@@ -19,7 +19,7 @@ const AppNavigator = () => {
           headerTitle: () => (
             <Text style={{ 
               fontSize: 20, fontWeight: 'bold', color: 'black', 
-              textAlign: 'center',marginRight: 10 }}>Detail</Text>
+              textAlign: 'center',marginRight: 10 }}>Chi tiết sản phẩm</Text>
           ),
           headerTitleAlign: 'center' // Căn giữa tiêu đề
         }} 

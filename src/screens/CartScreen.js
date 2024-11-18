@@ -56,7 +56,7 @@ const CartScreen = () => {
                   {item.image ? ( // Kiểm tra xem item.image có hợp lệ không
                     <Image source={{ uri: item.image }} style={styles.itemImage} />
                   ) : (
-                    <Text style={styles.emptyImageText}>No Image Available</Text> // Hiển thị thông báo nếu không có hình ảnh
+                    <Text>No Image Available</Text> // Hiển thị thông báo nếu không có hình ảnh
                   )}
                   <View style={styles.itemInfo}>
                     <View style={styles.nameDetailsContainer}>

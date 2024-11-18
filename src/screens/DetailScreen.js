@@ -50,11 +50,16 @@ const DetailScreen = ({ route }) => {
     addToCart(itemToAdd); // Thêm sản phẩm vào giỏ hàng
     console.log('Sản phẩm đã thêm vào giỏ hàng:', itemToAdd);
     Toast.show({
-      text1:'Thông báo', 
-      text2: `Sản phẩm đã được thêm vào giỏ hàng - Size: ${selectedSize}`,
+      text1: 'Đã thêm sản phẩm vào giỏ hàng',
+      text2: `Size ${selectedSize}`,
       position: 'top',
-      type: 'info',
-      duration: 2000, // Thay đổi thời gian hiển thị ở đây (tính bằng milliseconds)
+      type: 'success',
+      duration: 1500,
+      onShow: () => {
+        setTimeout(() => {
+          Toast.hide();
+        }, 1500); // Tự ẩn sau 1 giây
+      }
     });
   };
 
@@ -127,7 +132,7 @@ const DetailScreen = ({ route }) => {
           Giá: {price[selectedSize] ? Number(price[selectedSize]).toLocaleString('en-US') : 'N/A'} VND
         </Text>
         <TouchableOpacity style={styles.addToCartButton} onPress={handleAddToCart}>
-          <Text style={styles.buttonText}>Add to Cart</Text>
+          <Text style={styles.buttonText}>Mua ngay</Text>
         </TouchableOpacity>
       </View>
       

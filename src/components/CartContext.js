@@ -1,5 +1,8 @@
 import React, { createContext, useState } from 'react';
 import { firebase } from '@react-native-firebase/firestore';
+import auth from '@react-native-firebase/auth';
+import firestore from '@react-native-firebase/firestore';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Tạo context cho giỏ hàng
 export const CartContext = createContext();
@@ -50,23 +53,62 @@ export const CartProvider = ({ children }) => {
 
   const applyVoucher = async (code) => {
     try {
-      const vouchersRef = firebase.firestore().collection('Vouchers');
-      const snapshot = await vouchersRef
+      // Thử lấy thông tin từ AsyncStorage trước
+      const userString = await AsyncStorage.getItem('userData');
+      let userCode;
+      
+      if (userString) {
+        const userData = JSON.parse(userString);
+        userCode = userData.userCode;
+      }
+
+      // Double check với Firebase nếu không có trong AsyncStorage
+      if (!userCode) {
+        const currentUser = auth().currentUser;
+        if (!currentUser) {
+          return { success: false, message: 'Vui lòng đăng nhập để sử dụng voucher' };
+        }
+
+        const userDoc = await firestore()
+          .collection('USERS')
+          .doc(currentUser.email)
+          .get();
+
+        if (!userDoc.exists) {
+          return { success: false, message: 'Không tìm thấy thông tin người dùng' };
+        }
+
+        userCode = userDoc.data().userCode;
+        
+        // Cập nhật lại AsyncStorage
+        await AsyncStorage.setItem('userData', JSON.stringify(userDoc.data()));
+      }
+
+      if (!userCode) {
+        return { success: false, message: 'Không tìm thấy mã người dùng' };
+      }
+
+      // Kiểm tra voucher
+      const voucherSnapshot = await firestore()
+        .collection('Vouchers')
         .where('code', '==', code)
         .where('isActive', '==', true)
         .get();
 
-      if (snapshot.empty) {
+      if (voucherSnapshot.empty) {
         return { success: false, message: 'Mã giảm giá không hợp lệ' };
       }
 
-      const voucherData = snapshot.docs[0].data();
+      const voucherDoc = voucherSnapshot.docs[0];
+      const voucherData = voucherDoc.data();
       const now = Date.now();
 
+      // Kiểm tra thời hạn
       if (now < voucherData.startDate || now > voucherData.endDate) {
         return { success: false, message: 'Mã giảm giá đã hết hạn' };
       }
 
+      // Kiểm tra giá trị đơn hàng tối thiểu
       const cartTotal = cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
       if (cartTotal < voucherData.minimumAmount) {
         return { 
@@ -75,8 +117,22 @@ export const CartProvider = ({ children }) => {
         };
       }
 
+      // Kiểm tra xem user đã sử dụng voucher chưa
+      if (voucherData.usedBy && voucherData.usedBy.includes(userCode)) {
+        return { success: false, message: 'Bạn đã sử dụng mã giảm giá này' };
+      }
+
+      // Cập nhật danh sách người đã sử dụng
+      await firestore()
+        .collection('Vouchers')
+        .doc(voucherDoc.id)
+        .update({
+          usedBy: firestore.FieldValue.arrayUnion(userCode)
+        });
+
       setAppliedVoucher(voucherData);
       return { success: true, message: 'Áp dụng mã giảm giá thành công' };
+
     } catch (error) {
       console.error('Lỗi khi áp dụng voucher:', error);
       return { success: false, message: 'Đã có lỗi xảy ra' };

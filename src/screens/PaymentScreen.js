@@ -156,7 +156,7 @@ const PaymentScreen = ({ navigation }) => {
         ]}
         onPress={() => setSelectedPaymentMethod('ZaloPay')}
       >
-        <Text style={styles.buttonText}>ZaloPay</Text>
+        <Text style={styles.buttonText}>Thanh toán tiền qua ZaloPay</Text>
       </TouchableOpacity>
       <TouchableOpacity
         style={[
