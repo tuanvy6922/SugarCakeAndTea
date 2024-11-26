@@ -145,7 +145,7 @@ const RegisterScreen = ({ navigation }) => {
                             items={[
                                 { label: 'Nam', value: 'male' },
                                 { label: 'Nữ', value: 'female' },
-                                { label: 'Khác', value: 'other' },
+                                { label: 'Không tiết lộ', value: 'rather not say' },
                             ]}
                             setOpen={setGenderPickerOpen}
                             setValue={(callback) => {

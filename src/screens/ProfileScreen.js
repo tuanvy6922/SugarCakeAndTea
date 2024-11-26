@@ -61,6 +61,7 @@ const ProfileScreen = ({ navigation }) => {
     }
   };
 
+  // Liên hệ hỗ trợ
   const ContactSupport = () => {
     const subject = 'Hỗ trợ từ người dùng';
     const body = 'Xin chào, tôi cần hỗ trợ về sản phẩm.';
@@ -68,6 +69,7 @@ const ProfileScreen = ({ navigation }) => {
     Linking.openURL('mailto:2024802010278@student.tdmu.edu.vn?subject=' + subject + '&body=' + body);
   };
 
+  // Xoay card
   const handleFlip = () => {
     Animated.timing(rotateAnim, {
       toValue: flipped ? 0 : 1,
@@ -78,6 +80,7 @@ const ProfileScreen = ({ navigation }) => {
     setFlipped(!flipped);
   };
 
+  // Xoay card
   const frontInterpolate = rotateAnim.interpolate({
     inputRange: [0, 1],
     outputRange: ['0deg', '180deg'], // Xoay 180 độ
@@ -87,6 +90,20 @@ const ProfileScreen = ({ navigation }) => {
     inputRange: [0, 1],
     outputRange: ['180deg', '360deg'], // Xoay 180 độ
   });
+
+  // Hiển thị giới tính
+  const getGenderDisplay = (gender) => {
+    switch(gender?.toLowerCase()) {
+      case 'male':
+        return 'Nam';
+      case 'female':
+        return 'Nữ';
+      case 'other':
+        return 'Không tiết lộ';
+      default:
+        return 'Không tiết lộ';
+    }
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -101,7 +118,7 @@ const ProfileScreen = ({ navigation }) => {
                 />
                 <View style={styles.textContainer}>
                   <Text style={styles.name}>Xin chào {userData.fullName}</Text>
-                  <Text style={styles.text}>Giới tính: {userData.gender}</Text>
+                  <Text style={styles.text}>Giới tính: {getGenderDisplay(userData.gender)}</Text>
                   <Text style={styles.text}>Mã người dùng: {userData.userCode}</Text>
                 </View>
                 <View>

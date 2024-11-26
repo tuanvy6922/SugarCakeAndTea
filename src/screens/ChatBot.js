@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, TextInput, FlatList, TouchableOpacity } from 'react-native'
+import { StyleSheet, Text, View, TextInput, FlatList, TouchableOpacity, ActivityIndicator } from 'react-native'
 import React, { useState, useEffect, useRef } from 'react'
 import { GoogleGenerativeAI } from '@google/generative-ai'
 import firestore from '@react-native-firebase/firestore'
@@ -11,6 +11,7 @@ const ChatBot = () => {
   const [inputText, setInputText] = useState('')
   const [products, setProducts] = useState([])
   const flatListRef = useRef(null);
+  const [isLoading, setIsLoading] = useState(false)
 
   // Khởi tạo Gemini AI
   const genAI = new GoogleGenerativeAI('AIzaSyDb7e-jYQusGEJUZGF2y-X4JY4z7BpapcI')
@@ -18,7 +19,7 @@ const ChatBot = () => {
   useEffect(() => {
     // Thay thế greeting từ chatbotData bằng greeting cố định
     const welcomeMessage = {
-      text: "Xin chào! Tôi là trợ lý AI của cửa hàng. Tôi có thể giúp gì cho bạn?",
+      text: "Xin chào! Tôi là trợ lý tư vấn Sugar Cake & Tea. Bạn muốn mua hay tư vấn về sản phẩm nào?",
       isUser: false
     };
     setMessages([welcomeMessage]);
@@ -50,12 +51,14 @@ const ChatBot = () => {
     }
   };
 
+  // Gửi tin nhắn và nhận phản hồi từ Gemini AI
   const handleSend = async () => {
     if (!inputText.trim()) return;
 
     const userMessage = { text: inputText, isUser: true };
     setMessages(prev => [...prev, userMessage]);
     setInputText('');
+    setIsLoading(true);
     
     setTimeout(scrollToBottom, 100);
 
@@ -77,17 +80,31 @@ const ChatBot = () => {
         );
       });
 
-      if (relevantProducts.length > 0) {
-        const productsList = relevantProducts.map(p => 
-          `- ${p.name}: ${p.price?.toLocaleString()}đ\n  ${p.description || ''}`
-        ).join('\n');
+      // Hiển thị giá sản phẩm
+      if (relevantProducts.length > 0) {//
+        const productsList = relevantProducts.map(p => {
+          const prices = [];
+          if (p.price?.S) prices.push(`Size S: ${p.price.S.toLocaleString()}đ`);
+          if (p.price?.M) prices.push(`Size M: ${p.price.M.toLocaleString()}đ`);
+          if (p.price?.L) prices.push(`Size L: ${p.price.L.toLocaleString()}đ`);
+          
+          const priceText = prices.length > 0 
+            ? `\nGiá:\n${prices.join('\n')}`
+            : '';
+
+          return `- ${p.name}${priceText}\n  ${p.description || ''}`
+        }).join('\n\n');
 
         matchedResponse = `Dạ, em xin tư vấn về các sản phẩm bạn quan tâm:\n${productsList}\n\nBạn muốn tìm hiểu thêm về sản phẩm nào ạ?`;
       } else {
         // Bỏ phần tìm kiếm trong chatbotData, chuyển thẳng sang sử dụng Gemini AI
         const relevantProducts = products.map(p => ({
           name: p.name,
-          price: p.price,
+          price: {
+            S: p.price?.S,
+            M: p.price?.M,
+            L: p.price?.L
+          },
           description: p.description || '',
           category: p.category || ''
         }));
@@ -128,6 +145,8 @@ const ChatBot = () => {
       };
       setMessages(prev => [...prev, errorMessage]);
       setTimeout(scrollToBottom, 100);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -140,7 +159,7 @@ const ChatBot = () => {
         >
           <Entypo name="chevron-left" size={28} color="#007AFF" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Chat Bot</Text>
+        <Text style={styles.headerTitle}>Tư vấn sản phẩm</Text>
       </View>
       <FlatList
         ref={flatListRef}
@@ -148,11 +167,21 @@ const ChatBot = () => {
         keyExtractor={(_, index) => index.toString()}
         renderItem={({ item }) => (
           <View style={[styles.messageContainer, item.isUser ? styles.userMessage : styles.botMessage]}>
-            <Text style={styles.messageText}>{item.text}</Text>
+            <Text style={[styles.messageText, { color: item.isUser ? '#FFFFFF' : '#000000' }]}>
+              {item.text}
+            </Text>
           </View>
         )}
         onContentSizeChange={scrollToBottom}
         onLayout={scrollToBottom}
+        ListFooterComponent={() => (
+          isLoading ? (
+            <View style={styles.loadingContainer}>
+              <ActivityIndicator size="small" color="#007AFF" />
+              <Text style={styles.loadingText}>Đang soạn tin nhắn...</Text>
+            </View>
+          ) : null
+        )}
       />
       <View style={styles.inputContainer}>
         <TextInput
@@ -206,7 +235,7 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start',
   },
   messageText: {
-    color: '#000',
+    color: props => props.isUser ? '#FFFFFF' : '#000000',
   },
   inputContainer: {
     flexDirection: 'row',
@@ -228,5 +257,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     width: 44,
     height: 44,
+  },
+  loadingContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 10,
+    marginLeft: 10,
+  },
+  loadingText: {
+    marginLeft: 10,
+    color: '#666',
+    fontSize: 14,
   },
 })

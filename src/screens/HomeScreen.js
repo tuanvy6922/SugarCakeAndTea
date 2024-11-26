@@ -13,13 +13,13 @@ const { width, height } = Dimensions.get('window');
 const HomeScreen = () => {
   // Khởi tạo các state để quản lý dữ liệu
   const [sliderList, setSliderList] = useState([]); // Danh sách slider
-  const [data, setData] = useState([]); // Dữ liệu sản phẩm
+  const [data, setData] = useState([]); // Dữ liệu tất cả sản phẩm
   const user = auth().currentUser; // Người dùng hiện tại
   const [categories, setCategories] = useState([]); // Danh sách thể loại
-  const [selectedCategory, setSelectedCategory] = useState('All'); // Thể loại đã chọn
-  const [filteredData, setFilteredData] = useState([]); // Dữ liệu sản phẩm đã lọc
+  const [selectedCategory, setSelectedCategory] = useState(''); // Đặt mặc định là rỗng
+  const [filteredData, setFilteredData] = useState([]); // Dữ liệu đã lọc
   const navigation = useNavigation(); // Điều hướng giữa các màn hình
-  const [featuredProducts, setFeaturedProducts] = useState([]);
+  const [featuredProducts, setFeaturedProducts] = useState([]);// Dữ liệu sản phẩm nổi bật
 
   useEffect(() => {
     // Lấy dữ liệu từ Firestore
@@ -34,7 +34,7 @@ const HomeScreen = () => {
       .collection('Category')
       .onSnapshot(querySnapshot => {
         const categoriesList = querySnapshot.docs.map(doc => ({ id: doc.id, name: doc.data().name }));
-        setCategories([{ name: 'All' }, ...categoriesList]); // Cập nhật danh sách thể loại
+        setCategories(categoriesList);
       });
     // Lấy dữ liệu sản phẩm từ Firestore
     const unsubscribeProducts = firestore()
@@ -60,30 +60,18 @@ const HomeScreen = () => {
     };
   }, []);
 
+  // Xử lý khi người dùng nhấn vào thể loại
   const handleCategoryPress = (category) => {
-    // Xử lý khi người dùng nhấn vào thể loại
-    if (category.name === 'All') {
-      setFilteredData(data); // Hiển thị tất cả sản phẩm
-    } else {
-      // Lọc sản phẩm dựa trên tên thể loại
-      const filteredProducts = data.filter(item => item.category === category.name);
-      navigation.navigate('ItemList', { categoryName: category.name, products: filteredProducts });
-    }
+    setSelectedCategory(category.name);
+    const filteredProducts = data.filter(item => item.category === category.name);
+    navigation.navigate('ItemList', { categoryName: category.name, products: filteredProducts });
   };
 
   useEffect(() => {
-    filterDataByCategory(); // Lọc dữ liệu khi thể loại hoặc dữ liệu thay đổi
-  }, [selectedCategory, data]);
-
-  const filterDataByCategory = () => {
-    // Lọc dữ liệu sản phẩm theo thể loại đã chọn
-    if (selectedCategory === 'All') {
-      setFilteredData(data); 
-    } else {
-      const filtered = data.filter(item => item.category === selectedCategory);
-      setFilteredData(filtered);
-    }
-  };
+    // Luôn set filteredData bằng toàn bộ data khi component mount
+    // hoặc khi data thay đổi
+    setFilteredData(data);
+  }, [data]);
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollViewContent}>
@@ -205,14 +193,14 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
-    elevation: 2,
+    elevation: 5,
     marginTop: 1,
     minHeight: 40,
     maxHeight: 40,
     marginBottom: 10,
   },
   categoryText: {
-    fontSize: 16,
+    fontSize: 18,
     color: 'grey',
   },
   sectionText: {

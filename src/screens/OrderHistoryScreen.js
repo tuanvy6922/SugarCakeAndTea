@@ -33,11 +33,26 @@ const OrderHistoryScreen = ({ navigation }) => {
     return () => unsubscribe();
   }, []);
 
+  // Chuyển đổi trạng thái hoá đơn sang tiếng Việt
+  const getVietnameseStatus = (status) => {
+    switch (status?.toLowerCase()) {
+      case 'completed':
+        return 'Thanh toán hoàn tất';
+      case 'confirmed':
+        return 'Đã xác nhận';
+      case 'cancelled':
+        return 'Đã hủy';
+      case 'processing':
+        return 'Đang xử lý';
+      default:
+        return status || 'Không xác định';
+    }
+  };
+
   const renderItem = ({ item }) => {
-    // Tạo một bản sao của item và chuyển đổi date thành string
     const orderData = {
       ...item,
-      date: item.date ? item.date.toISOString() : null, // Chuyển date thành string
+      date: item.date ? item.date.toISOString() : null,
     };
 
     return (
@@ -50,6 +65,7 @@ const OrderHistoryScreen = ({ navigation }) => {
           Thời gian giao dịch: {item.date ? item.date.toLocaleString('vi-VN') : 'N/A'}
         </Text>
         <Text style={styles.billText}>Địa chỉ: {item.address}</Text>
+        <Text style={styles.billText}>Trạng thái: {getVietnameseStatus(item.status)}</Text>
         <View style={styles.totalContainer}>
           <Text style={styles.totalText}>
             Tổng tiền: {Number(item.totalAmount).toLocaleString('en-US')} VND
