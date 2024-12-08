@@ -27,7 +27,7 @@ const OrderStackNavigation = () => {
         name="OrderDetail" 
         component={OrderDetailScreen}
         options={{ 
-          headerTitle: 'Chi tiết hoá đơn',
+          headerTitle: 'Chi tiết đơn hàng',
           headerTitleAlign: 'center', 
           headerStyle: {
             backgroundColor: '#ffffff'

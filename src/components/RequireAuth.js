@@ -8,13 +8,16 @@ const RequireAuth = (WrappedComponent) => {
         const navigation = useNavigation();
         const [isChecking, setIsChecking] = useState(true);
 
+        // Kiểm tra trạng thái đăng nhập
         useEffect(() => {
             checkAuthStatus();
         }, []);
 
         const checkAuthStatus = async () => {
             try {
+                // Lấy thông tin user từ AsyncStorage
                 const userRole = await AsyncStorage.getItem('userRole');
+                // Nếu userRole là guest thì hiển thị alert yêu cầu đăng nhập
                 if (userRole === 'guest') {
                     Alert.alert(
                         "Yêu cầu đăng nhập",
@@ -44,10 +47,12 @@ const RequireAuth = (WrappedComponent) => {
             }
         };
 
+        // Hiển thị loading state khi đang kiểm tra trạng thái đăng nhập
         if (isChecking) {
             return <View />; // Loading state
         }
 
+        // Nếu không có lỗi, hiển thị component được bao bởi RequireAuth
         return <WrappedComponent {...props} />;
     };
 };

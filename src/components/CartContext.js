@@ -15,7 +15,10 @@ export const CartProvider = ({ children }) => {
   // Hàm thêm sản phẩm vào giỏ hàng
   const addToCart = (item) => {
     setCartItems((prevItems) => {
+      // Kiểm tra sản phẩm có tồn tại trong giỏ hàng hay không
       const existingItem = prevItems.find((i) => i.index === item.index && i.size === item.size);
+
+      // Nếu sản phẩm tồn tại, tăng số lượng lên 1
       if (existingItem) {
         return prevItems.map((i) =>
           i.index === item.index && i.size === item.size ? { ...i, quantity: i.quantity + 1 } : i
@@ -30,7 +33,9 @@ export const CartProvider = ({ children }) => {
   // Hàm giảm số lượng sản phẩm trong giỏ hàng
   const removeFromCart = (index, size) => {
     setCartItems((prevItems) => {
+      // Cập nhật số lượng sản phẩm trong giỏ hàng
       const updatedItems = prevItems.map((item) => {
+        // Nếu sản phẩm tồn tại, giảm số lượng đi 1
         if (item.index === index && item.size === size) {
           return { ...item, quantity: item.quantity - 1 };
         }
@@ -57,6 +62,7 @@ export const CartProvider = ({ children }) => {
       const userString = await AsyncStorage.getItem('userData');
       let userCode;
       
+      // Nếu có thông tin user trong AsyncStorage, lấy mã người dùng
       if (userString) {
         const userData = JSON.parse(userString);
         userCode = userData.userCode;
@@ -69,6 +75,7 @@ export const CartProvider = ({ children }) => {
           return { success: false, message: 'Vui lòng đăng nhập để sử dụng voucher' };
         }
 
+        // Lấy thông tin người dùng từ Firebase
         const userDoc = await firestore()
           .collection('USERS')
           .doc(currentUser.email)
@@ -99,6 +106,7 @@ export const CartProvider = ({ children }) => {
         return { success: false, message: 'Mã giảm giá không hợp lệ' };
       }
 
+      // Lấy thông tin voucher từ Firebase
       const voucherDoc = voucherSnapshot.docs[0];
       const voucherData = voucherDoc.data();
       const now = Date.now();
@@ -130,6 +138,7 @@ export const CartProvider = ({ children }) => {
           usedBy: firestore.FieldValue.arrayUnion(userCode)
         });
 
+      // Cập nhật mã giảm giá đã áp dụng
       setAppliedVoucher(voucherData);
       return { success: true, message: 'Áp dụng mã giảm giá thành công' };
 
@@ -144,8 +153,11 @@ export const CartProvider = ({ children }) => {
   };
 
   const getFinalTotal = () => {
+    // Tính tổng giá trị giỏ hàng
     const cartTotal = cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
+    // Tính giá trị giảm giá
     const discount = appliedVoucher ? cartTotal * appliedVoucher.discount : 0;
+    // Trả về tổng giá trị sau khi áp dụng giảm giá
     return cartTotal - discount;
   };
 
