@@ -1,11 +1,14 @@
-import { StyleSheet, Text, View, FlatList, Image, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, FlatList, Image, TouchableOpacity, Modal } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
-import { AntDesign } from '@expo/vector-icons';
+import { AntDesign, Entypo } from '@expo/vector-icons';
 
 const OrderHistoryScreen = ({ navigation }) => {
   const [bills, setBills] = useState([]);
+  const [filterStatus, setFilterStatus] = useState('all');
+  const [filterDate, setFilterDate] = useState('all');
+  const [isFilterVisible, setIsFilterVisible] = useState(false);
 
   useEffect(() => {
     const user = auth().currentUser;
@@ -49,12 +52,113 @@ const OrderHistoryScreen = ({ navigation }) => {
     }
   };
 
+  // Function lọc bills
+  const getFilteredBills = () => {
+    let filtered = [...bills];
+    
+    if (filterStatus !== 'all') {
+      filtered = filtered.filter(bill => bill.status === filterStatus);
+    }
+
+    if (filterDate === 'thisMonth') {
+      const now = new Date();
+      filtered = filtered.filter(bill => {
+        const billDate = new Date(bill.date);
+        return billDate.getMonth() === now.getMonth() && billDate.getFullYear() === now.getFullYear();
+      });
+    } else if (filterDate === 'lastMonth') {
+      const now = new Date();
+      const lastMonth = now.getMonth() === 0 ? 11 : now.getMonth() - 1;
+      const year = now.getMonth() === 0 ? now.getFullYear() - 1 : now.getFullYear();
+      filtered = filtered.filter(bill => {
+        const billDate = new Date(bill.date);
+        return billDate.getMonth() === lastMonth && billDate.getFullYear() === year;
+      });
+    }
+
+    return filtered;
+  };
+
+  // Component cho filter modal
+  const FilterModal = () => (
+    <Modal
+      animationType="slide"
+      transparent={true}
+      visible={isFilterVisible}
+      onRequestClose={() => setIsFilterVisible(false)}
+    >
+      <View style={styles.modalOverlay}>
+        <View style={styles.modalContent}>
+          <View style={styles.modalHeader}>
+            <Text style={styles.modalTitle}>Bộ lọc</Text>
+            <TouchableOpacity onPress={() => setIsFilterVisible(false)}>
+              <AntDesign name="close" size={24} color="black" />
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.filterSection}>
+            <Text style={styles.filterLabel}>Trạng thái:</Text>
+            <View style={styles.filterOptions}>
+              {['all', 'confirmed', 'processing', 'completed', 'cancelled'].map((status) => (
+                <TouchableOpacity
+                  key={status}
+                  style={[
+                    styles.filterOption,
+                    filterStatus === status && styles.filterOptionActive
+                  ]}
+                  onPress={() => setFilterStatus(status)}
+                >
+                  <Text style={[
+                    styles.filterOptionText,
+                    filterStatus === status && styles.filterOptionTextActive
+                  ]}>
+                    {status === 'all' ? 'Tất cả' :
+                     status === 'confirmed' ? 'Đã xác nhận' :
+                     status === 'processing' ? 'Đang xử lý' :
+                     status === 'completed' ? 'Hoàn tất' : 'Đã hủy'}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
+
+          <View style={styles.filterSection}>
+            <Text style={styles.filterLabel}>Thời gian:</Text>
+            <View style={styles.filterOptions}>
+              {[
+                { value: 'all', label: 'Tất cả' },
+                { value: 'thisMonth', label: 'Tháng này' },
+                { value: 'lastMonth', label: 'Tháng trước' }
+              ].map((option) => (
+                <TouchableOpacity
+                  key={option.value}
+                  style={[
+                    styles.filterOption,
+                    filterDate === option.value && styles.filterOptionActive
+                  ]}
+                  onPress={() => setFilterDate(option.value)}
+                >
+                  <Text style={[
+                    styles.filterOptionText,
+                    filterDate === option.value && styles.filterOptionTextActive
+                  ]}>
+                    {option.label}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
+        </View>
+      </View>
+    </Modal>
+  );
+
   const renderItem = ({ item }) => {
     const orderData = {
       ...item,
       date: item.date ? item.date.toISOString() : null,
     };
-
+    
     return (
       <TouchableOpacity 
         style={styles.billContainer}
@@ -81,17 +185,27 @@ const OrderHistoryScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      {bills.length > 0 ? (
+      <View style={styles.header}>
+        <Text style={styles.headerTitle}>Lịch sử đơn hàng</Text>
+        <TouchableOpacity 
+          style={styles.filterButton}
+          onPress={() => setIsFilterVisible(true)}
+        >
+          <Entypo name="sound-mix" size={24} color="#D17842" />
+        </TouchableOpacity>
+      </View>
+
+      <FilterModal />
+      
+      {getFilteredBills().length > 0 ? (
         <FlatList
-          showsVerticalScrollIndicator={true}
-          data={bills}
+          data={getFilteredBills()}
           renderItem={renderItem}
           keyExtractor={item => item.id}
         />
       ) : (
         <View style={styles.emptyContainer}>
-          <Text style={styles.title}>Bạn chưa có lịch sử đơn hàng nào !</Text>
-          <Text style={styles.promptText}>Hãy mua sắm ngay để có hóa đơn đầu tiên của bạn.</Text>
+          <Text style={styles.title}>Không tìm thấy đơn hàng nào!</Text>
         </View>
       )}
     </View>
@@ -207,5 +321,81 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: 'blue',
     marginRight: 5,
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 15,
+    backgroundColor: '#f9f9f9',
+    borderRadius: 10,
+    shadowColor: '#000',  // Thêm shadow để nổi bật
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+    marginBottom: 10,
+  },
+  headerTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
+  filterButton: {
+    padding: 5,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'flex-end',
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    padding: 20,
+    maxHeight: '80%',
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
+  filterSection: {
+    marginBottom: 20,
+  },
+  filterLabel: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  filterOptions: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 10,
+  },
+  filterOption: {
+    paddingHorizontal: 15,
+    paddingVertical: 8,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: '#D17842',
+    marginBottom: 8,
+  },
+  filterOptionActive: {
+    backgroundColor: '#D17842',
+  },
+  filterOptionText: {
+    color: '#D17842',
+  },
+  filterOptionTextActive: {
+    color: '#fff',
   },
 });

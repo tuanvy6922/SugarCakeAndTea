@@ -63,29 +63,34 @@ const generateUniqueUserCode = () => {
         });
 };
 
-const createAccount = (fullName, email, password, role, phoneNumber, address, gender) => { 
-    generateUniqueUserCode()
-        .then(userCode => {
-            auth().createUserWithEmailAndPassword(email, password)
-                .then(() => {
-                    USERS.doc(email)
-                    .set({
-                        fullName,
-                        email,
-                        password,
-                        role,
-                        phoneNumber,
-                        address,
-                        state: 'Available',
-                        userCode,
-                        gender,
-                    })
-                    .then(() => console.log("User created successfully with code:", userCode))
-                    .catch(e => console.log("Error adding user to Firestore:", e.message));
-                })
-                .catch(e => console.log(e.message));
+const createAccount = async (fullName, email, password, role, phoneNumber, address, gender) => {
+    try {
+        // 1. Tạo mã người dùng duy nhất
+        const userCode = await generateUniqueUserCode();
+        
+        // 2. Tạo tài khoản authentication
+        const userCredential = await auth().createUserWithEmailAndPassword(email, password);
+        
+        // 3. Tạo document trong Firestore
+        await USERS.doc(email).set({
+            fullName,
+            email,
+            password,
+            role,
+            phoneNumber,
+            address,
+            state: 'Available',
+            userCode,
+            gender,
         });
-}
+        
+        console.log("User created successfully with code:", userCode);
+        return userCredential;
+    } catch (error) {
+        console.error("Error in createAccount:", error);
+        throw error; // Ném lỗi để component có thể xử lý
+    }
+};
 const login = (dispatch, email, password) => {
     auth().signInWithEmailAndPassword(email, password)
         .then(() => {

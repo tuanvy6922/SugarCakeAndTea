@@ -92,7 +92,7 @@ const TabNavigation = () => {
         name="Bill-nav"
         component={OrderStackNavigation}
         options={{
-          tabBarLabel: "Biến động",
+          tabBarLabel: "Thông báo",
           headerShown: false,
           tabBarLabelStyle: { color: "black" },
           tabBarIcon: ({ focused }) =>

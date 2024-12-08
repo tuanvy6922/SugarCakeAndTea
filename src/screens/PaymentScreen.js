@@ -7,6 +7,7 @@ import { CartContext } from '../components/CartContext';
 import CryptoJS from 'crypto-js';
 import moment from 'moment';
 import { Entypo } from 'react-native-vector-icons';
+import RequireAuth from '../components/RequireAuth';
 
 // Cấu hình ZaloPay
 const config = {
@@ -141,10 +142,10 @@ const PaymentScreen = ({ navigation }) => {
         </TouchableOpacity>
         <Text style={styles.title}>Phương thức thanh toán</Text>
       </View>
-      <Text style={styles.label}>Địa chỉ giao hàng:</Text>
+      <Text style={styles.label}>Nhập thông tin địa chỉ:</Text>
       <TextInput
         style={styles.input}
-        placeholder="Nhập địa chỉ giao hàng"
+        placeholder="Nhập thông tin địa chỉ"
         value={address}
         onChangeText={setAddress}
       />
@@ -234,4 +235,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default PaymentScreen;
+export default RequireAuth(PaymentScreen);

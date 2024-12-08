@@ -126,6 +126,17 @@ const LoginScreen = ({ navigation }) => {
         }
     };
 
+    const handleGuestLogin = async () => {
+        try {
+            // Lưu trạng thái guest vào AsyncStorage
+            await AsyncStorage.setItem('userRole', 'guest');
+            navigation.navigate("Home-nav");
+        } catch (error) {
+            console.error("Error during guest login:", error);
+            ToastAndroid.show("Có lỗi xảy ra, vui lòng thử lại!", ToastAndroid.SHORT);
+        }
+    };
+
     return (
         <SafeAreaView style={styles.container}>
             <View style={styles.content}>
@@ -175,6 +186,20 @@ const LoginScreen = ({ navigation }) => {
                     <Text style={styles.loginButtonText}>Đăng nhập</Text>
                 </TouchableOpacity>
 
+                <View style={styles.dividerContainer}>
+                    <View style={styles.divider} />
+                    <Text style={styles.dividerText}>hoặc</Text>
+                    <View style={styles.divider} />
+                </View>
+
+                <TouchableOpacity 
+                    onPress={handleGuestLogin}
+                    style={[styles.guestButton]}
+                    activeOpacity={0.8}
+                >
+                    <Text style={styles.guestButtonText}>Tiếp tục với tư cách khách vãng lai</Text>
+                </TouchableOpacity>
+
                 <View style={styles.registerContainer}>
                     <Text style={styles.registerText}>Bạn chưa có tài khoản?</Text>
                     <TouchableOpacity onPress={() => navigation.navigate("Register")}>
@@ -210,7 +235,7 @@ const styles = StyleSheet.create({
         alignSelf: 'center',
         height: 180,
         width: 180,
-        marginBottom: 48,
+        marginBottom: 12,
     },
     input: {
         marginBottom: 16,
@@ -230,7 +255,7 @@ const styles = StyleSheet.create({
         padding: 16,
         borderRadius: 12,
         alignItems: 'center',
-        marginBottom: 24,
+        marginBottom: 2,
         elevation: 2,
     },
     loginButtonText: {
@@ -259,6 +284,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         marginTop: 16,
+        marginBottom: 80,
         padding: 8,
     },
     supportText: {
@@ -266,5 +292,33 @@ const styles = StyleSheet.create({
         fontSize: 14,
         fontWeight: '500',
         marginLeft: 8,
+    },
+    dividerContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginVertical: 10,
+    },
+    divider: {
+        flex: 1,
+        height: 1,
+        backgroundColor: '#E2E8F0',
+    },
+    dividerText: {
+        marginHorizontal: 10,
+        color: '#64748B',
+        fontSize: 14,
+    },
+    guestButton: {
+        backgroundColor: '#E2E8F0',
+        padding: 16,
+        borderRadius: 12,
+        alignItems: 'center',
+        marginBottom: 24,
+        elevation: 2,
+    },
+    guestButtonText: {
+        color: '#64748B',
+        fontSize: 16,
+        fontWeight: '600',
     },
 });

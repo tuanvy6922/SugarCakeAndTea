@@ -1,7 +1,9 @@
-import { StyleSheet, Text, View, ScrollView, Image } from 'react-native';
+import { StyleSheet, Text, View, ScrollView, Image, Alert } from 'react-native';
 import React from 'react';
+import firestore from '@react-native-firebase/firestore';
+import { TouchableOpacity } from 'react-native';
 
-const OrderDetailScreen = ({ route }) => {
+const OrderDetailScreen = ({ route, navigation }) => {
   if (!route.params || !route.params.order) {
     return (
       <View style={styles.container}>
@@ -11,6 +13,35 @@ const OrderDetailScreen = ({ route }) => {
   }
 
   const { order } = route.params;
+
+  const cancelOrder = async () => {
+    try {
+      Alert.alert(
+        "Xác nhận hủy đơn",
+        "Bạn có chắc chắn muốn hủy đơn hàng này?",
+        [
+          {
+            text: "Không",
+            style: "cancel"
+          },
+          {
+            text: "Có", 
+            onPress: async () => {
+              await firestore()
+                .collection('Bills')
+                .doc(order.id)
+                .update({
+                  status: 'cancelled'
+                });
+              navigation.goBack();
+            }
+          }
+        ]
+      );
+    } catch (error) {
+      Alert.alert("Lỗi", "Không thể hủy đơn hàng. Vui lòng thử lại sau.");
+    }
+  };
 
   return (
     <ScrollView style={styles.container}>
@@ -52,8 +83,6 @@ const OrderDetailScreen = ({ route }) => {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Chi tiết thanh toán</Text>
           <Text style={styles.billText}>Tổng tiền: {Number(order.totalAmount).toLocaleString('en-US')} VND</Text>
-          
-          {/* Hiển thị thông tin voucher */}
           <View style={styles.voucherInfo}>
             <Text style={[
               styles.voucherText,
@@ -65,6 +94,15 @@ const OrderDetailScreen = ({ route }) => {
               }
             </Text>
           </View>
+
+          {order.paymentMethod === 'Cash' && order.status !== 'cancelled' && order.status !== 'completed' && (
+            <TouchableOpacity 
+              style={styles.cancelButton}
+              onPress={cancelOrder}
+            >
+              <Text style={styles.cancelButtonText}>Hủy đơn hàng</Text>
+            </TouchableOpacity>
+          )}
         </View>
       </View>
     </ScrollView>
@@ -181,7 +219,19 @@ const styles = StyleSheet.create({
   },
   noVoucherText: {
     color: '#666',
-  }
+  },
+  cancelButton: {
+    backgroundColor: '#ff4444',
+    padding: 15,
+    borderRadius: 8,
+    marginTop: 20,
+  },
+  cancelButtonText: {
+    color: 'white',
+    textAlign: 'center',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
 });
 
 export default OrderDetailScreen;

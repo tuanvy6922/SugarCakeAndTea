@@ -5,7 +5,7 @@ import firestore from '@react-native-firebase/firestore';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AntDesign, Entypo } from '@expo/vector-icons';
-
+import RequireAuth from '../components/RequireAuth';
 
 const { width, height } = Dimensions.get('window') 
 
@@ -14,7 +14,6 @@ const ProfileScreen = ({ navigation }) => {
   const user = auth().currentUser;
   const [flipped, setFlipped] = useState(false); // State để theo dõi trạng thái xoay
   const rotateAnim = useRef(new Animated.Value(0)).current; // Khởi tạo giá trị xoay
-
 
   useEffect(() => {
     const user = auth().currentUser;
@@ -187,7 +186,7 @@ const ProfileScreen = ({ navigation }) => {
   );
 };
 
-export default ProfileScreen;
+export default RequireAuth(ProfileScreen);
 
 const styles = StyleSheet.create({
   container: {
@@ -277,5 +276,49 @@ const styles = StyleSheet.create({
   },
   iconContainer:{
     marginRight: 10,
+  },
+  guestMessageContainer: {
+    alignItems: 'center',
+    marginVertical: 40,
+    padding: 20,
+  },
+  guestTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    color: '#333',
+  },
+  guestMessage: {
+    fontSize: 16,
+    color: '#666',
+    textAlign: 'center',
+    marginBottom: 20,
+  },
+  loginButton: {
+    backgroundColor: '#3B82F6',
+    padding: 15,
+    borderRadius: 10,
+    width: '100%',
+    marginBottom: 10,
+  },
+  loginButtonText: {
+    color: '#fff',
+    textAlign: 'center',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  registerButton: {
+    backgroundColor: '#fff',
+    padding: 15,
+    borderRadius: 10,
+    width: '100%',
+    borderWidth: 1,
+    borderColor: '#3B82F6',
+  },
+  registerButtonText: {
+    color: '#3B82F6',
+    textAlign: 'center',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });

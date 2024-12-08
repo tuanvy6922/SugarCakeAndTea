@@ -4,6 +4,41 @@ import { GoogleGenerativeAI } from '@google/generative-ai'
 import firestore from '@react-native-firebase/firestore'
 import { Entypo } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
+import { 
+  searchProductPrompt, 
+  categoryPrompt, 
+  pricePrompt,
+  productDetailPrompt,
+  healthPrompt,
+  ingredientPrompt,
+  promotionPrompt,
+  storeInfoPrompt,
+  orderPrompt
+} from '../data/chatbotPrompts';
+
+const PROMPT_KEYWORDS = {
+  PRICE: ['giá', 'bao nhiêu', 'tiền'],
+  CATEGORY: ['loại', 'danh mục', 'menu'],
+  HEALTH: ['sức khỏe', 'dinh dưỡng', 'dị ứng', 'tiểu đường', 'bệnh'],
+  INGREDIENT: ['nguyên liệu', 'thành phần', 'làm từ'],
+  PROMOTION: ['khuyến mãi', 'giảm giá', 'ưu đãi', 'mã'],
+  STORE_INFO: ['địa chỉ', 'địa điểm', 'mở cửa', 'liên hệ', 'số điện thoại'],
+  PRODUCT_DETAIL: ['chi tiết', 'mô tả', 'hương vị'],
+  ORDER:['đặt', 'hàng', 'đơn', 'phí', 'giao hàng', 'khu vực'],
+};
+
+const getPromptType = (userInput) => {
+  const input = userInput.toLowerCase();
+  
+  // Kiểm tra từng loại prompt dựa trên keywords
+  for (const [type, keywords] of Object.entries(PROMPT_KEYWORDS)) {
+    if (keywords.some(keyword => input.includes(keyword))) {
+      return type;
+    }
+  }
+  
+  return 'SEARCH'; // Default prompt type
+};
 
 const ChatBot = () => {
   const navigation = useNavigation();
@@ -51,6 +86,11 @@ const ChatBot = () => {
     }
   };
 
+  // Tạo danh sách categories từ products
+  const getUniqueCategories = () => {
+    return [...new Set(products.map(product => product.category))];
+  };
+
   // Gửi tin nhắn và nhận phản hồi từ Gemini AI
   const handleSend = async () => {
     if (!inputText.trim()) return;
@@ -63,71 +103,27 @@ const ChatBot = () => {
     setTimeout(scrollToBottom, 100);
 
     try {
-      const userInputLower = inputText.toLowerCase();
-      let matchedResponse = null;
+      const promptType = getPromptType(inputText);
+      const uniqueCategories = getUniqueCategories();
+      
+      // Object map các loại prompt
+      const promptMap = {
+        PRICE: pricePrompt(products, inputText),
+        CATEGORY: categoryPrompt(products, uniqueCategories, inputText),
+        HEALTH: healthPrompt(products, inputText),
+        INGREDIENT: ingredientPrompt(products, inputText),
+        PROMOTION: promotionPrompt(products, inputText),
+        STORE_INFO: storeInfoPrompt(products, inputText),
+        PRODUCT_DETAIL: productDetailPrompt(products, inputText),
+        SEARCH: searchProductPrompt(products, inputText),
+        ORDER: orderPrompt(products, inputText),
+      };
 
-      // Tìm sản phẩm liên quan từ Firebase
-      const relevantProducts = products.filter(product => {
-        const searchTerms = [
-          product.name?.toLowerCase(),
-          product.category?.toLowerCase(),
-          product.description?.toLowerCase()
-        ].filter(Boolean);
-
-        return searchTerms.some(term => 
-          userInputLower.includes(term) || 
-          term?.includes(userInputLower)
-        );
-      });
-
-      // Hiển thị giá sản phẩm
-      if (relevantProducts.length > 0) {//
-        const productsList = relevantProducts.map(p => {
-          const prices = [];
-          if (p.price?.S) prices.push(`Size S: ${p.price.S.toLocaleString()}đ`);
-          if (p.price?.M) prices.push(`Size M: ${p.price.M.toLocaleString()}đ`);
-          if (p.price?.L) prices.push(`Size L: ${p.price.L.toLocaleString()}đ`);
-          
-          const priceText = prices.length > 0 
-            ? `\nGiá:\n${prices.join('\n')}`
-            : '';
-
-          return `- ${p.name}${priceText}\n  ${p.description || ''}`
-        }).join('\n\n');
-
-        matchedResponse = `Dạ, em xin tư vấn về các sản phẩm bạn quan tâm:\n${productsList}\n\nBạn muốn tìm hiểu thêm về sản phẩm nào ạ?`;
-      } else {
-        // Bỏ phần tìm kiếm trong chatbotData, chuyển thẳng sang sử dụng Gemini AI
-        const relevantProducts = products.map(p => ({
-          name: p.name,
-          price: {
-            S: p.price?.S,
-            M: p.price?.M,
-            L: p.price?.L
-          },
-          description: p.description || '',
-          category: p.category || ''
-        }));
-
-        const prompt = `
-          Bạn là trợ lý tư vấn của cửa hàng bánh trà.
-          
-          Thông tin tất cả sản phẩm hiện có:
-          ${JSON.stringify(relevantProducts, null, 2)}
-          
-          Câu hỏi: ${inputText}
-          
-          Hãy trả lời ngắn gọn và chính xác. Nếu được hỏi về sản phẩm:
-          - Cung cấp thông tin về tên, giá và mô tả
-          - Nếu không tìm thấy thông tin, hãy thông báo cho người dùng
-          - Luôn kết thúc bằng câu hỏi để tương tác với khách hàng
-        `.trim();
-
-        const model = genAI.getGenerativeModel({ model: "gemini-pro" });
-        const result = await model.generateContent(prompt);
-        const response = await result.response;
-        matchedResponse = response.text();
-      }
+      const prompt = promptMap[promptType];
+      const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+      const result = await model.generateContent(prompt);
+      const response = await result.response;
+      const matchedResponse = response.text();
 
       if (!matchedResponse) {
         throw new Error('Không nhận được phản hồi');
@@ -144,10 +140,18 @@ const ChatBot = () => {
         isUser: false 
       };
       setMessages(prev => [...prev, errorMessage]);
-      setTimeout(scrollToBottom, 100);
     } finally {
       setIsLoading(false);
     }
+  };
+
+  // Thêm hàm xử lý new chat
+  const handleNewChat = () => {
+    const welcomeMessage = {
+      text: "Xin chào! Tôi là trợ lý tư vấn Sugar Cake & Tea. Bạn muốn mua hay tư vấn về sản phẩm nào?",
+      isUser: false
+    };
+    setMessages([welcomeMessage]);
   };
 
   return (
@@ -160,6 +164,12 @@ const ChatBot = () => {
           <Entypo name="chevron-left" size={28} color="#007AFF" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Tư vấn sản phẩm</Text>
+        <TouchableOpacity 
+          style={styles.newChatButton}
+          onPress={handleNewChat}
+        >
+          <Text style={styles.newChatText}>New Chat</Text>
+        </TouchableOpacity>
       </View>
       <FlatList
         ref={flatListRef}
@@ -211,6 +221,7 @@ const styles = StyleSheet.create({
     padding: 10,
     borderBottomWidth: 1,
     borderBottomColor: '#eee',
+    justifyContent: 'space-between',
   },
   backButton: {
     padding: 5,
@@ -268,5 +279,16 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     color: '#666',
     fontSize: 14,
+  },
+  newChatButton: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    backgroundColor: '#007AFF',
+    borderRadius: 15,
+  },
+  newChatText: {
+    color: '#FFFFFF',
+    fontSize: 14,
+    fontWeight: '500',
   },
 })
