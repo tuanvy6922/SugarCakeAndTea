@@ -20,7 +20,7 @@ const ProfileScreen = ({ navigation }) => {
     if (!user) return;
 
     const unsubscribe = firestore()
-      .collection('USERS')
+      .collection('Customer')
       .doc(user.email)
       .onSnapshot(
         (document) => {

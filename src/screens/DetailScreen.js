@@ -65,7 +65,7 @@ const DetailScreen = ({ route }) => {
 
   const handleToggleFavorite = async () => {
     const userEmail = auth().currentUser.email;
-    const favoriteRef = firestore().collection('USERS').doc(userEmail).collection('Favorite').doc(currentProduct.id);
+    const favoriteRef = firestore().collection('Customer').doc(userEmail).collection('Favorite').doc(currentProduct.id);
 
     if (isFavorite(currentProduct.id)) {
       await favoriteRef.delete();

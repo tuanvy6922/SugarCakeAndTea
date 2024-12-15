@@ -54,6 +54,7 @@ export const CartProvider = ({ children }) => {
 
   const clearCart = () => {
     setCartItems([]);
+    setAppliedVoucher(null);
   };
 
   const applyVoucher = async (code) => {
@@ -77,7 +78,7 @@ export const CartProvider = ({ children }) => {
 
         // Lấy thông tin người dùng từ Firebase
         const userDoc = await firestore()
-          .collection('USERS')
+          .collection('Customer')
           .doc(currentUser.email)
           .get();
 

@@ -34,7 +34,7 @@ const LoginScreen = ({ navigation }) => {
             const userCredential = await auth().signInWithEmailAndPassword(email, password);
             const user = userCredential.user;
             //lấy thông tin người dùng từ Firebase
-            const userDoc = await firestore().collection('USERS').doc(user.email).get();
+            const userDoc = await firestore().collection('Customer').doc(user.email).get();
 
             if (userDoc.exists) {
                 const userData = userDoc.data();
@@ -65,11 +65,11 @@ const LoginScreen = ({ navigation }) => {
             if (newAttempts >= 5) {
                 try {
                     // Get user document by email
-                    const userDoc = await firestore().collection('USERS').doc(email).get();
+                    const userDoc = await firestore().collection('Customer').doc(email).get();
                     
                     if (userDoc.exists) {
                         // Update state to Blocked
-                        await firestore().collection('USERS').doc(email).update({
+                        await firestore().collection('Customer').doc(email).update({
                             state: 'Blocked'
                         });
                         Alert.alert(

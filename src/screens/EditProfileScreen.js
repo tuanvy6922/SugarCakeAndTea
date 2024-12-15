@@ -21,7 +21,7 @@ const EditProfileScreen = ({ navigation }) => {
     const user = auth().currentUser
     if (user) {
       firestore()
-        .collection('USERS')
+        .collection('Customer')
         .doc(user.email)
         .get()
         .then(document => {
@@ -46,7 +46,7 @@ const EditProfileScreen = ({ navigation }) => {
 
     try {
       await firestore()
-        .collection('USERS')
+        .collection('Customer')
         .doc(user.email)
         .update({
           fullName: userData.fullName,

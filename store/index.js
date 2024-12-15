@@ -43,10 +43,10 @@ const useMyContextProvider = () =>{
     return context
 }
 
-const USERS = firestore().collection("USERS") 
+const Customer = firestore().collection("Customer") 
 // Dinh nghia action
 const checkUserCodeExists = (userCode) => {
-    return USERS
+    return Customer
         .where('userCode', '==', userCode)
         .get()
         .then(snapshot => !snapshot.empty);
@@ -72,7 +72,7 @@ const createAccount = async (fullName, email, password, role, phoneNumber, addre
         const userCredential = await auth().createUserWithEmailAndPassword(email, password);
         
         // 3. Tạo document trong Firestore
-        await USERS.doc(email).set({
+        await Customer.doc(email).set({
             fullName,
             email,
             password,
@@ -94,7 +94,7 @@ const createAccount = async (fullName, email, password, role, phoneNumber, addre
 const login = (dispatch, email, password) => {
     auth().signInWithEmailAndPassword(email, password)
         .then(() => {
-            USERS.doc(email).get()
+            Customer.doc(email).get()
                 .then((u) => {
                     if (u.exists) {
                         const value = u.data();

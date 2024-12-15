@@ -55,7 +55,7 @@ const ChangePassword = () => {
 
       // Cập nhật mật khẩu trong Firestore
       await firestore()
-        .collection('USERS')
+        .collection('Customer')
         .doc(user.email) // Sử dụng email làm ID tài liệu
         .update({
           password: newPassword, // Cập nhật mật khẩu mới

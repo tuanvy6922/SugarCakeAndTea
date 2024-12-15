@@ -57,6 +57,17 @@ const OrderDetailScreen = ({ route, navigation }) => {
           </Text>
           <Text style={styles.billText}>Địa chỉ: {order.address}</Text>
           <Text style={styles.billText}>Phương thức thanh toán: {order.paymentMethod}</Text>
+          <Text style={styles.billText}>Trạng thái giao hàng: {
+            order.deliveryStatus === 'pending' ? 'Chờ xử lý' :
+            order.deliveryStatus === 'delivering' ? 'Đang giao hàng' :
+            order.deliveryStatus === 'delivered' ? 'Đã giao hàng' : 'Không xác định'
+          }</Text>
+        </View>
+
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Thông tin cửa hàng</Text>
+          <Text style={styles.billText}>Tên cửa hàng: {order.store.name}</Text>
+          <Text style={styles.billText}>Địa chỉ: {order.store.address}</Text>
         </View>
 
         <View style={styles.section}>

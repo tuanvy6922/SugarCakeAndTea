@@ -51,7 +51,7 @@ const RegisterScreen = ({ navigation }) => {
     const checkEmailExists = async (email) => {
         try {
             const querySnapshot = await firestore()
-                .collection('USERS')
+                .collection('Customer')
                 .where('email', '==', email)
                 .get();
             

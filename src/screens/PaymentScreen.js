@@ -1,5 +1,5 @@
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, Alert, Linking } from 'react-native';
-import React, { useState } from 'react';
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, Alert, Linking, ScrollView } from 'react-native';
+import React, { useState, useEffect } from 'react';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 import { useContext } from 'react';
@@ -22,6 +22,24 @@ const PaymentScreen = ({ navigation }) => {
   const [address, setAddress] = useState('');
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(null);
   const { cartItems, clearCart, getFinalTotal, appliedVoucher } = useContext(CartContext);
+  const [selectedStore, setSelectedStore] = useState(null);
+  const [stores, setStores] = useState([]);
+
+  useEffect(() => {
+    const fetchStores = async () => {
+      const storesSnapshot = await firestore().collection('Store').get();
+      const storesData = storesSnapshot.docs.map(doc => ({
+        id: doc.id,
+        name: doc.data().name,
+        address: doc.data().address
+      }));
+      setStores(storesData);
+      if (storesData.length > 0) {
+        setSelectedStore(storesData[0]);
+      }
+    };
+    fetchStores();
+  }, []);
 
   const handlePayment = async () => {
     if (!address) {
@@ -30,6 +48,10 @@ const PaymentScreen = ({ navigation }) => {
     }
     if (!selectedPaymentMethod) {
       Alert.alert('Thông báo', 'Vui lòng chọn phương thức thanh toán.');
+      return;
+    }
+    if (!selectedStore) {
+      Alert.alert('Thông báo', 'Vui lòng chọn cửa hàng.');
       return;
     }
 
@@ -41,7 +63,7 @@ const PaymentScreen = ({ navigation }) => {
       }
 
       const userDoc = await firestore()
-        .collection('USERS')
+        .collection('Customer')
         .doc(user.email)
         .get();
 
@@ -56,9 +78,14 @@ const PaymentScreen = ({ navigation }) => {
         address,
         paymentMethod: selectedPaymentMethod,
         status: selectedPaymentMethod === 'ZaloPay' ? 'cancelled' : 'confirmed',
+        deliveryStatus: 'pending',
         totalAmount: finalTotal,
         voucherCode: appliedVoucher ? appliedVoucher.code : "Không có",
-        voucherDiscount: appliedVoucher ? appliedVoucher.discount : 0
+        voucherDiscount: appliedVoucher ? appliedVoucher.discount : 0,
+        store: {
+          name: selectedStore.name,
+          address: selectedStore.address
+        }
       };
 
       if (selectedPaymentMethod === 'ZaloPay') {
@@ -135,7 +162,7 @@ const PaymentScreen = ({ navigation }) => {
   };
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Entypo name="chevron-left" size={24} color="#000" />
@@ -168,15 +195,29 @@ const PaymentScreen = ({ navigation }) => {
       >
         <Text style={styles.buttonText}>Nhận hàng và trả tiền mặt</Text>
       </TouchableOpacity>
+      <Text style={styles.label}>Chọn cửa hàng:</Text>
+      <View style={styles.storeContainer}>
+        {stores.map((store) => (
+          <TouchableOpacity
+            key={store.id}
+            style={[
+              styles.storeButton,
+              selectedStore?.id === store.id && styles.selectedButton,
+            ]}
+            onPress={() => setSelectedStore(store)}
+          >
+            <Text style={styles.buttonText}>{store.name}</Text>
+            <Text style={styles.addressText}>{store.address}</Text>
+          </TouchableOpacity>
+        ))}
+      </View>
       <TouchableOpacity
-        style={[
-          styles.payButton,
-        ]}
+        style={styles.payButton}
         onPress={handlePayment}
       >
         <Text style={styles.payButtonText}>Xác nhận</Text>
       </TouchableOpacity>
-    </View>
+    </ScrollView>
   );
 };
 
@@ -215,7 +256,8 @@ const styles = StyleSheet.create({
     padding: 15,
     borderRadius: 5,
     alignItems: 'center',
-    marginTop: 20,
+    marginTop: 5,
+    marginBottom: 20,
   },
   payButtonText: {
     color: '#fff',
@@ -232,6 +274,21 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginLeft: 10,
     justifyContent:'center',
+  },
+  storeContainer: {
+    marginBottom: 0,
+  },
+  storeButton: {
+    padding: 15,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 5,
+    marginBottom: 10,
+  },
+  addressText: {
+    fontSize: 14,
+    color: '#666',
+    marginTop: 5,
   },
 });
 

@@ -12,7 +12,7 @@ const FavoritesScreen = () => {
   useEffect(() => {
     const fetchFavorites = async () => {//lấy danh sách sản phẩm yêu thích
       if (user) {
-        const favoriteRef = firestore().collection('USERS').doc(user.email).collection('Favorite');
+        const favoriteRef = firestore().collection('Customer').doc(user.email).collection('Favorite');
         const snapshot = await favoriteRef.get();
         const favorites = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         setFavoriteItems(favorites);
@@ -23,7 +23,7 @@ const FavoritesScreen = () => {
   }, [user]);
 
   const handleRemoveFavorite = async (itemId) => {//xóa sản phẩm yêu thích
-    const favoriteRef = firestore().collection('USERS').doc(user.email).collection('Favorite').doc(itemId);
+    const favoriteRef = firestore().collection('Customer').doc(user.email).collection('Favorite').doc(itemId);
     await favoriteRef.delete();
     removeFavorite(itemId);
 

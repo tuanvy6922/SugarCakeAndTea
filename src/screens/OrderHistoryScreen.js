@@ -40,13 +40,27 @@ const OrderHistoryScreen = ({ navigation }) => {
   const getVietnameseStatus = (status) => {
     switch (status?.toLowerCase()) {
       case 'completed':
-        return 'Thanh toán hoàn tất';
+        return 'Đã thanh toán';
       case 'confirmed':
         return 'Đã xác nhận';
       case 'cancelled':
         return 'Đã hủy';
       case 'processing':
         return 'Đang xử lý';
+      default:
+        return status || 'Không xác định';
+    }
+  };
+
+  // Thêm hàm này sau hàm getVietnameseStatus
+  const getVietnameseDeliveryStatus = (status) => {
+    switch (status?.toLowerCase()) {
+      case 'pending':
+        return 'Chờ xử lý';
+      case 'delivering':
+        return 'Đang giao hàng';
+      case 'delivered':
+        return 'Đã giao hàng';
       default:
         return status || 'Không xác định';
     }
@@ -170,6 +184,7 @@ const OrderHistoryScreen = ({ navigation }) => {
         </Text>
         <Text style={styles.billText}>Địa chỉ: {item.address}</Text>
         <Text style={styles.billText}>Trạng thái: {getVietnameseStatus(item.status)}</Text>
+        <Text style={styles.billText}>Trạng thái giao hàng: {getVietnameseDeliveryStatus(item.deliveryStatus)}</Text>
         <View style={styles.totalContainer}>
           <Text style={styles.totalText}>
             Tổng tiền: {Number(item.totalAmount).toLocaleString('en-US')} VND
@@ -205,7 +220,7 @@ const OrderHistoryScreen = ({ navigation }) => {
         />
       ) : (
         <View style={styles.emptyContainer}>
-          <Text style={styles.title}>Không tìm thấy đơn hàng nào!</Text>
+          <Text style={styles.title}>Hiện tại chưa có đơn hàng nào!</Text>
         </View>
       )}
     </View>
