@@ -82,7 +82,7 @@ const SearchScreen = () => {
                 <Text style={styles.productName}>{item.name}</Text>
                 <Text style={styles.productDescription}>{item.special_ingredient}</Text>
                 <Text style={styles.productPrice}>
-                  Price: {item.price && item.price.S ? item.price.S.toLocaleString('en-US') : 'N/A'} VND
+                  Giá: {item.price && item.price.S ? item.price.S.toLocaleString('en-US') : 'N/A'} VND
                 </Text>
               </View>
             </TouchableOpacity>

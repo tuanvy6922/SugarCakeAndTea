@@ -92,9 +92,15 @@ const LoginScreen = ({ navigation }) => {
     useEffect(() => {
         if (userLogin != null) {
             if (userLogin.role === "admin" && userLogin.state === "Available") {
-                navigation.navigate("Admin");
+                navigation.reset({
+                    index: 0,
+                    routes: [{ name: 'Admin' }],
+                });
             } else if (userLogin.role === "user" && userLogin.state === "Available") {
-                navigation.navigate("Home-nav");
+                navigation.reset({
+                    index: 0,
+                    routes: [{ name: 'Home-nav' }],
+                });
             }
         }
     }, [userLogin]);

@@ -15,6 +15,7 @@ const ProfileScreen = ({ navigation }) => {
   const [flipped, setFlipped] = useState(false); // State để theo dõi trạng thái xoay
   const rotateAnim = useRef(new Animated.Value(0)).current; // Khởi tạo giá trị xoay
 
+  // Lấy thông tin người dùng từ Firestore
   useEffect(() => {
     const user = auth().currentUser;
     if (!user) return;
@@ -46,16 +47,22 @@ const ProfileScreen = ({ navigation }) => {
       await AsyncStorage.removeItem('userRole');
       await AsyncStorage.removeItem('userState');
       await AsyncStorage.removeItem('userCode');
+      
+      // Reset userData state
       setUserData(null);
+      setFlipped(false);
+      rotateAnim.setValue(0);
 
       // Thông báo cho người dùng
       ToastAndroid.show("Đăng xuất thành công!", ToastAndroid.SHORT);
 
       // Điều hướng đến màn hình đăng nhập
-      navigation.navigate('Login');
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'Login' }],
+      });
     } catch (error) {
       console.error("Error signing out: ", error);
-      // Thông báo lỗi cho người dùng
       Alert.alert("Có lỗi xảy ra khi đăng xuất. Vui lòng thử lại!");
     }
   };
@@ -153,11 +160,6 @@ const ProfileScreen = ({ navigation }) => {
             <Text style={styles.buttonText}>Danh sách yêu thích</Text>
             <Entypo name="heart" size={16} color="#333" style={styles.icon} />
           </TouchableOpacity>
-
-          {/* <TouchableOpacity style={styles.button} onPress={() => Linking.openURL('https://www.google.com/maps/dir/?api=1&destination=10.898691950486857,106.69612421102295&q=SUGAR+CAKE+%26+TEA')}>
-            <Text style={styles.buttonText}>Vị trí cửa hàng</Text>
-            <Entypo name="location-pin" size={16} color="#333" style={styles.icon} />
-          </TouchableOpacity> */}
 
           <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('StoreLocationScreen')}>
             <Text style={styles.buttonText}>Vị trí cửa hàng</Text>

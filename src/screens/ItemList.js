@@ -19,7 +19,7 @@ const ItemList = () => {
             <View style={styles.textContainer}>
               <Text style={styles.itemName}>{item.name}</Text>
               <Text style={styles.specialIngredient}>{item.special_ingredient}</Text>
-              <Text style={styles.itemPrice}>Price: {item.price && item.price.S ? item.price.S.toLocaleString('en-US') : 'N/A'} VND</Text>
+              <Text style={styles.itemPrice}>Giá: {item.price && item.price.S ? item.price.S.toLocaleString('en-US') : 'N/A'} VND</Text>
             </View>
           </TouchableOpacity>
         )}
@@ -61,7 +61,8 @@ const styles = StyleSheet.create({
   itemPrice: {
     color: 'green',
     fontWeight: 'bold',
-    marginBottom: 4, // Thêm khoảng cách dưới giá
+    marginTop: 5,
+    marginBottom: 5, // Thêm khoảng cách dưới giá
   },
   specialIngredient: {
     fontStyle: 'italic',

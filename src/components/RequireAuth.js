@@ -15,9 +15,17 @@ const RequireAuth = (WrappedComponent) => {
 
         const checkAuthStatus = async () => {
             try {
-                // Lấy thông tin user từ AsyncStorage
                 const userRole = await AsyncStorage.getItem('userRole');
-                // Nếu userRole là guest thì hiển thị alert yêu cầu đăng nhập
+                const userEmail = await AsyncStorage.getItem('userEmail');
+                
+                if (!userEmail && userRole !== 'guest') {
+                    navigation.reset({
+                        index: 0,
+                        routes: [{ name: 'Login' }],
+                    });
+                    return;
+                }
+                
                 if (userRole === 'guest') {
                     Alert.alert(
                         "Yêu cầu đăng nhập",
@@ -26,15 +34,19 @@ const RequireAuth = (WrappedComponent) => {
                             {
                                 text: "Đăng nhập",
                                 onPress: () => {
-                                    navigation.goBack();
-                                    navigation.navigate('Login');
+                                    navigation.reset({
+                                        index: 0,
+                                        routes: [{ name: 'Login' }],
+                                    });
                                 }
                             },
                             {
                                 text: "Đăng ký",
                                 onPress: () => {
-                                    navigation.goBack();
-                                    navigation.navigate('Register');
+                                    navigation.reset({
+                                        index: 0,
+                                        routes: [{ name: 'Register' }],
+                                    });
                                 }
                             }
                         ]
